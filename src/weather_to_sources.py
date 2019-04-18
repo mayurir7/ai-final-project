@@ -1,3 +1,18 @@
+class State():
+    """
+    State for the Q-learning situation
+    """
+    def __init__(self):
+        self.energy_levels = [] # energy left, indexed by EnergySource enum
+        self.weather = []
+
+    def updateEnergy(self, energy_used):
+        """
+        Pass in array of amounts of energy consumed, indexed by EnergySource
+        """
+        for index in range(len(energy_levels)):
+            energy_levels[index] = energy_levels[index] - energy_used[index]
+
 class FeatureExtractor():
     def __init__(self, filename):
         self.data = []
@@ -46,3 +61,9 @@ class ApproximateQLearner():
         difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state,action)
         for feature in featureVector:
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
+
+    def calculateReward(self, state):
+        """
+        Calculates the reward for the given state
+        Reward should be a mix of balanced-ness of energy levels + 
+        """
