@@ -2,11 +2,11 @@
 #Wind: day’s conditions -  units of wind energy produced
 
 #state representation
-#[(solar, kWh), (wind, kWh)...]
+#[(solar, actual kWh?, predicted kWh?), (wind, kWh)...]
 
 #reward function
 #Given current state, action to be taken, next state, return value
-#How close the kWh it generated was to the previous?
+#How close the kWh it generated (prediction) was to the actual data 
 
 class ApproximateQAgent(PacmanQAgent):
                 """
@@ -32,10 +32,8 @@ class ApproximateQAgent(PacmanQAgent):
                                 "*** YOUR CODE HERE ***"
                                 featureVector = self.featExtractor.getFeatures(state, action)
                                 weight = self.getWeights()
-                                result = weight * featureVector  #matrix multiply?
+                                result = weight * featureVector
                                 return result
-
-#action class or enum
 
                 def update(self, state, action, nextState, reward):
                                 """
