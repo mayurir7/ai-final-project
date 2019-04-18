@@ -8,7 +8,7 @@
 #Given current state, action to be taken, next state, return value
 #How close the kWh it generated (prediction) was to the actual data 
 
-class ApproximateQAgent(PacmanQAgent):
+class ApproximateQAgent():  #(PacmanQAgent):
                 """
                          ApproximateQLearningAgent
 
@@ -16,10 +16,14 @@ class ApproximateQAgent(PacmanQAgent):
                          and update.  All other QLearningAgent functions
                          should work as is.
                 """
-                def __init__(self, extractor='IdentityExtractor', **args):
-                                self.featExtractor = util.lookup(extractor, globals())()
-                                PacmanQAgent.__init__(self, **args)
-                                self.weights = util.Counter()
+                
+                #def __init__(self, extractor='IdentityExtractor', **args):
+                def __init__(self):
+                                #self.featExtractor = util.lookup(extractor, globals())()
+                                #self.featExtractor = list of features!!
+                                #PacmanQAgent.__init__(self, **args)
+                                #self.weights = util.Counter()
+                                self.weights = [0 for _ in range(10)] #a list of the same length of features
 
                 def getWeights(self):
                                 return self.weights

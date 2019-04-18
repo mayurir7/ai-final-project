@@ -5,9 +5,10 @@ class FeatureExtractor():
 
     def readData(self, filename):
         """
-        Reads in weather data from a file and stores it somehow
+        Reads in weather data from a file and stores it somehow (in self.data?)
         """
-        print "done"
+
+        print("done")
 
     def next(self):
         """
@@ -22,7 +23,7 @@ class ApproximateQLearner():
     """
     
     def __init__(self):
-        self.weights = []
+        self.weights = [0 for _ in range(len(WeatherConditions))]
         self.featExtractor = FeatureExtractor()
 
     def getWeights(self):
