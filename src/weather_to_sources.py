@@ -20,10 +20,43 @@ class FeatureExtractor():
 
     def readData(self, filename):
         """
-        Reads in weather data from a file and stores it somehow (in self.data?)
+        Reads in weather data from a file and stores it (in self.data?)
         """
 
-        print("done")
+        #read in weather data from csv
+
+        #convert weather to power [W]
+        wind_power = calculate_wind_power(wind_speed)
+        solar_power = calculate_solar_power(sun_hours)
+        hydro_power = calculate_hydro_power()
+
+        self.data.append((wind_power, solar_power, hydro_power))
+
+    def calculate_wind_power(air_density, wind_speed):
+    	#returns wind power in watts
+
+    	air_density = 1 #could change but isn't that important
+    	area = 7853 #(max in texas onshore is 130 feet diameter, radius = 50ft, pi*r^2 == 7853)
+    	return .5*air_density*area*(wind_speed ** 3)
+
+
+    def calculate_solar_power(panel_wattage, sun_hours):
+    	#returns solar power in watts
+    	
+    	fudge_factor = .75
+    	panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capactity in Travis county)
+    	return panel_wattage*sun_hours*fudge_factor
+
+    def calculate_hydro_power():
+    	#returns hydro power in watts
+    	
+    	efficiency = .8 #general hydroelectric plant efficiency
+    	water_density = 997
+    	flow_rate = 1 #may vary because of rain but usually doesn't
+    	gravity_acceleration = 9.8
+    	height_diff = 100.5 #austin's tom miller dam
+
+    	return efficiency*water_density*flow_rate*gravity_acceleration*height_diff
 
     def next(self):
         """
