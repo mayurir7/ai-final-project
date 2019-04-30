@@ -1,9 +1,14 @@
+from data_reader import WeatherData
+from data_reader import RandomReader
+
+
+
 class State():
     """
     State for the Q-learning situation
     """
     def __init__(self):
-        self.energy_levels = [] # energy left, indexed by EnergySource enum
+        self.energy_levels = [] #energy left, indexed by EnergySource enum
         self.weather = []
 
     def updateEnergy(self, energy_used):
@@ -14,49 +19,64 @@ class State():
             energy_levels[index] = energy_levels[index] - energy_used[index]
 
 class FeatureExtractor():
-    def __init__(self, filename):
+    def __init__(self):
         self.data = []
-        readData(filename)
+        self.readData()
 
-    def readData(self, filename):
+    def readData(self):
         """
         Reads in weather data from a file and stores it (in self.data?)
         """
 
-        #read in weather data from csv
+        #read in weather data from csv/call scraper
 
-        #convert weather to power [W]
-        wind_power = calculate_wind_power(wind_speed)
-        solar_power = calculate_solar_power(sun_hours)
-        hydro_power = calculate_hydro_power()
+        #read in all days at once?
+        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day?
+        while weather_reader.canGetForecast():
+            forecast = weather_reader.getForecast() #forecast = list of tuples
+            for weather_tuple in forecast:
+                #convert wind from miles/hour to meters/second
+                weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
+            self.data.append(forecast)
+            weather_reader.advanceTime()
+        
 
-        self.data.append((wind_power, solar_power, hydro_power))
+        #convert weather to power (watts)
+        #go through self.data and calculate power for the hour
+        hourly_power = []
+        for day in self.data:
+            for weather_tuple in day:
+                wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
+                solar_power = self.calculate_solar_power(weather_tuple.sunlight)
+                hydro_power = self.calculate_hydro_power()
+                hourly_power.append((wind_power, solar_power, hydro_power))
 
-    def calculate_wind_power(air_density, wind_speed):
-    	#returns wind power in watts
 
-    	air_density = 1 #could change but isn't that important
-    	area = 7853 #(max in texas onshore is 130 feet diameter, radius = 50ft, pi*r^2 == 7853)
-    	return .5*air_density*area*(wind_speed ** 3)
+    def calculate_wind_power(self, wind_speed):
+        #returns wind power in watts
+
+        air_density = 1 #could change but isn't that important
+        area = 7853 #(max in texas onshore is 130 feet diameter, radius = 50ft, pi*r^2 == 7853)
+        return .5*air_density*area*(wind_speed ** 3)
 
 
-    def calculate_solar_power(panel_wattage, sun_hours):
-    	#returns solar power in watts
-    	
-    	fudge_factor = .75
-    	panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capactity in Travis county)
-    	return panel_wattage*sun_hours*fudge_factor
+    def calculate_solar_power(self, sun_hours):
+        #returns solar power in watts
+        
+        fudge_factor = .75
+        panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capactity in Travis county)
+        return panel_wattage*sun_hours*fudge_factor
 
-    def calculate_hydro_power():
-    	#returns hydro power in watts
-    	
-    	efficiency = .8 #general hydroelectric plant efficiency
-    	water_density = 997
-    	flow_rate = 1 #may vary because of rain but usually doesn't
-    	gravity_acceleration = 9.8
-    	height_diff = 100.5 #austin's tom miller dam
+    def calculate_hydro_power(self):
+        #returns hydro power in watts
+        
+        efficiency = .8 #average hydroelectric plant efficiency
+        water_density = 997
+        flow_rate = 1 #may vary because of rain but usually doesn't
+        gravity_acceleration = 9.8
+        height_diff = 100.5 #austin's tom miller dam
 
-    	return efficiency*water_density*flow_rate*gravity_acceleration*height_diff
+        return efficiency*water_density*flow_rate*gravity_acceleration*height_diff
 
     def next(self):
         """
@@ -101,3 +121,8 @@ class ApproximateQLearner():
         Calculates the reward for the given state
         Reward should be a mix of balanced-ness of energy levels + 
         """
+
+
+if __name__ == '__main__':
+    test = FeatureExtractor()
+
