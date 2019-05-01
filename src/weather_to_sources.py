@@ -1,6 +1,7 @@
 from data_reader import WeatherData
 from data_reader import RandomReader
 from enums import EnergySource, WeatherConditions
+import itertools
 
 class State():
     """
@@ -140,17 +141,25 @@ class ApproximateQLearner():
         """
 
 class Runner():
-    def __init__(self, iterations):
+    def __init__(self, iterations, max_energy_needed):
         self.learner = ApproximateQLearner()
         self.features = FeatureExtractor()
         self.iterations = iterations
         self.state = State(0, 0)
+        self.action_space = self.generateLegalActions(max_energy_needed)
+
+    def generateLegalActions(self, max_energy_needed):
+        """
+        Returns an array of actions for the largest energy needed
+        """
+        incr = max_energy_needed / 100
+        return [item for item in itertools.product(range(0, max_energy_needed, incr), repeat=3)]
 
     def getLegalActions(self, energy_needed):
-        """
-        Returns an array of legal actions
-        """
-        actions = [(w in range(energy_needed), s in range(energy_needed), h in range(energy_needed), c in range(energy_needed))]
+        actions = []
+        for (s, w, h) in self.action_space:
+            if s <= energy_needed and w <= energy_needed and h <= energy_needed:
+                actions.append((s, w, h))
         return actions
 
     def getOptimalAction(self, state, actions):
@@ -164,17 +173,17 @@ class Runner():
         return bestAction
 
     def iterate(self):
-        # get energy needed for that day/hour: TODO
-        energy_needed = features.getEnergyNeeded(self.state.day, self.state.hour)
+        # get energy needed for that day/hour
+        energy_needed = self.features.getEnergyNeeded(self.state.day, self.state.hour)
         # get legal actions and set in Q-learner
-        legalActions = getLegalActions(energy_needed)
+        legalActions = self.getLegalActions(energy_needed)
         self.learner.setLegalActions(legalActions)
         # take optimal action
-        action = getOptimalAction(self.state, legalActions)
+        action = self.getOptimalAction(self.state, legalActions)
         nextState = self.state
         nextState.energy_levels = self.state.energy_levels + self.features.getFeatures(self.state) - action
         # learn from it
-        reward = calculateReward(self.state, action)
+        reward = self.calculateReward(self.state, action)
         self.learner.update(self.state, action, nextState, reward)
         self.state = nextState
 
@@ -188,5 +197,5 @@ class Runner():
             iterate()
 
 if __name__ == '__main__':
-    test = Runner(1000)
-
+    test = Runner(1000, 70000 * 1000000)
+    test.iterate()
