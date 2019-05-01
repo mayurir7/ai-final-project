@@ -141,12 +141,6 @@ class ApproximateQLearner():
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
 
 class Runner():
-    def __init__(self):
-        self.learner = ApproximateQLearner()
-        self.features = FeatureExtractor()
-        self.iterations = iterations
-        self.state = State(0, 0)
-    
     def __init__(self, iterations):
         self.learner = ApproximateQLearner()
         self.features = FeatureExtractor()
@@ -172,7 +166,7 @@ class Runner():
 
     def iterate(self):
         # get energy needed for that day/hour: TODO
-        energy_needed = features.getEnergyNeeded(self.state.day, self.state.hour)
+        energy_needed = features.getEnergyNeeded(self.state)
         # get legal actions and set in Q-learner
         legalActions = getLegalActions(energy_needed)
         self.learner.setLegalActions(legalActions)
