@@ -2,7 +2,7 @@ from data_reader import WeatherData
 from data_reader import RandomReader
 from enums import EnergySource, WeatherConditions
 import itertools
-from operator import sub
+import random
 
 class State():
     """
@@ -56,7 +56,7 @@ class FeatureExtractor():
 
         #fill in self.energy_needed!!!!
         #convert MW to watts (* 1,000,000)
-
+        
 
     def calculate_wind_power(self, wind_speed):
         #returns wind power in watts
@@ -125,7 +125,7 @@ class ApproximateQLearner():
     """
 
     def __init__(self):
-        self.weights = [1.0 for _ in range(len(WeatherConditions))]
+        self.weights = [random.random() for _ in range(len(WeatherConditions))]
         self.featExtractor = FeatureExtractor()
         self.discount = 0.5
         self.alpha = 0.1
@@ -165,7 +165,7 @@ class ApproximateQLearner():
         Should update your weights based on transition
         """
         featureVector = self.featExtractor.getFeatures(state)
-        difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state,action)
+        difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state, action)
         for idx in range(len(featureVector)):
             self.weights[idx] = self.getWeights()[idx] + (self.alpha * difference * featureVector[idx])
 
@@ -181,7 +181,7 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        incr = max_energy_needed / 100
+        incr = max_energy_needed / 100 if max_energy_needed > 100 else 1
         return [item for item in itertools.product(range(0, max_energy_needed, incr), repeat=3)]
 
     def getLegalActions(self, energy_needed):
@@ -193,26 +193,26 @@ class Runner():
 
     def getOptimalAction(self, state, actions):
         bestAction = None
-        bestQVal = 0
+        bestQVal = None
         for action in actions:
             qval = self.learner.getQValue(state, action)
-            print qval
-            if qval >= bestQVal:
+            if bestQVal == None:
+                bestAction = action
+                bestQVal = qval
+            elif qval >= bestQVal:
                 bestAction = action
                 bestQVal = qval
         return bestAction
 
     def iterate(self):
         # get energy needed for that day/hour
-        #energy_needed = self.features.getEnergyNeeded(self.state)
-        energy_needed = 50
+        energy_needed = self.features.getEnergyNeeded(self.state)
         # get legal actions and set in Q-learner
         legalActions = self.getLegalActions(energy_needed)
         self.learner.setLegalActions(legalActions)
         # take optimal action
         action = self.getOptimalAction(self.state, legalActions)
         nextState = self.state
-        print action
         for idx in range(len(nextState.energy_levels)):
             nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
         # learn from it
@@ -229,8 +229,7 @@ class Runner():
         for power in self.features.getFeatures(state):
             renewables = renewables + power
 
-        #coal_used = self.features.getEnergyNeeded(state) - renewables
-        coal_used = 10
+        coal_used = self.features.getEnergyNeeded(state) - renewables
 
         return -1 * coal_used
 
@@ -239,5 +238,5 @@ class Runner():
             self.iterate()
 
 if __name__ == '__main__':
-    test = Runner(1, 70)
+    test = Runner(1000, 700000)
     test.run()
