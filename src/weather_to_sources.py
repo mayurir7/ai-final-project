@@ -1,6 +1,6 @@
 from data_reader import WeatherData
 from data_reader import RandomReader
-from enums import EnergySource
+from enums import EnergySource, WeatherConditions
 
 class State():
     """
@@ -96,14 +96,16 @@ class FeatureExtractor():
 class ApproximateQLearner():
     """
     self.weights: list storing the weights, index matches up with features
-    action representation: int matching up with EnergySource enum
     """
 
     def __init__(self):
         self.weights = [0 for _ in range(len(WeatherConditions))]
         self.featExtractor = FeatureExtractor()
         self.discount = 0.5
+        self.legalActions = []
 
+    def setLegalActions(self, actions):
+        self.legalActions = actions
 
     def getWeights(self):
         return self.weights
@@ -119,9 +121,9 @@ class ApproximateQLearner():
         return result
 
     def computeValueFromQValues(self, state):
-    """
+        """
         Returns Q value that comes from taking optimal action in this state
-    """
+        """
         maxVal = 0
         for action in range(EnergySource):
             temp = getQValue(state, action)
@@ -139,10 +141,52 @@ class ApproximateQLearner():
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
 
 class Runner():
+<<<<<<< HEAD
     def __init__(self):
-        learner = ApproximateQLearner()
-        features = FeatureExtractor()
+        self.learner = ApproximateQLearner()
+        self.features = FeatureExtractor()
+        self.iterations = iterations
+        self.state = State(0, 0)
     
+=======
+    def __init__(self, iterations):
+        self.learner = ApproximateQLearner()
+        self.features = FeatureExtractor()
+        self.iterations = iterations
+        self.state = State(0, 0)
+
+    def getLegalActions(self, energy_needed):
+        """
+        Returns an array of legal actions
+        """
+        actions = [(w in range(energy_needed), s in range(energy_needed), h in range(energy_needed), c in range(energy_needed))]
+        return actions
+
+    def getOptimalAction(self, state, actions):
+        bestAction = None
+        bestQVal = 0
+        for action in actions:
+            qval = self.learner.getQVal(state, action)
+            if qval > bestQVal:
+                bestAction = action
+                bestQVal = qval
+        return bestAction
+
+    def iterate(self):
+        # get energy needed for that day/hour: TODO
+        energy_needed = features.getEnergyNeeded(self.state.day, self.state.hour)
+        # get legal actions and set in Q-learner
+        legalActions = getLegalActions(energy_needed)
+        self.learner.setLegalActions(legalActions)
+        # take optimal action
+        action = getOptimalAction(self.state, legalActions)
+        nextState = self.state
+        nextState.energy_levels = self.state.energy_levels + self.features.getFeatures(self.state) - action
+        # learn from it
+        reward = calculateReward(self.state, action)
+        self.learner.update(self.state, action, nextState, reward)
+        self.state = nextState
+
     def calculateReward(self, state, action):
         """
         Calculates reward for given state based on how much coal used
@@ -156,6 +200,10 @@ class Runner():
 
         return -coal_used
 
+    def run(self):
+        for idx in range(self.iterations):
+            iterate()
+
 if __name__ == '__main__':
-    test = FeatureExtractor()
+    test = Runner(1000)
 
