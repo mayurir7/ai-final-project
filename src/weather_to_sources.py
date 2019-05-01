@@ -95,6 +95,8 @@ class ApproximateQLearner():
     def __init__(self):
         self.weights = [0 for _ in range(len(WeatherConditions))]
         self.featExtractor = FeatureExtractor()
+        self.discount = 0.5
+
 
     def getWeights(self):
         return self.weights
@@ -124,7 +126,7 @@ class ApproximateQLearner():
         """
         Should update your weights based on transition
         """
-        featureVector = self.featExtractor.getFeatures(state,action)
+        featureVector = self.featExtractor.getFeatures(state, action)
         difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state,action)
         for feature in featureVector:
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
@@ -133,6 +135,15 @@ class ApproximateQLearner():
         """
         Calculates the reward for the given state
         Reward should be a mix of balanced-ness of energy levels + 
+        """
+
+class Runner():
+    def __init__(self):
+        learner = ApproximateQLearner()
+    
+    def calculateReward(self, state):
+        """
+        Calculates reward for given state based on how much coal used
         """
 
 if __name__ == '__main__':
