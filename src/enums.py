@@ -1,10 +1,9 @@
 from enum import Enum
 
 class EnergySource(Enum):
-    SOLAR = 0
-    WIND = 1
+    WIND = 0
+    SOLAR = 1
     HYDRO = 2
-    COAL = 3
 
 class WeatherConditions(Enum):
     SUNLIGHT = 0
