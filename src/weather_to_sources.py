@@ -20,14 +20,14 @@ class State():
 
 class FeatureExtractor():
     def __init__(self):
-        self.raw_data = []
+        self.weather_conditions = []
         self.features = []
         self.energy_needed = [] #read in from excel sheet/json -- this is the energy needed [MW] per hour
         self.readData()
 
     def readData(self):
         """
-        Reads in weather data from a file and stores it (in self.raw_data)
+        Reads in weather data from a file and stores it
         """
 
         #read in weather data from csv/call scraper
@@ -39,13 +39,13 @@ class FeatureExtractor():
             for weather_tuple in forecast:
                 #convert wind from miles/hour to meters/second
                 weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
-            self.raw_data.append(forecast)
+            self.weather_conditions.append(forecast)
             weather_reader.advanceTime()
 
 
         #convert weather to power (watts)
         #go through self.data and calculate power for the hour
-        for day in self.raw_data:
+        for day in self.weather_conditions:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
@@ -53,7 +53,7 @@ class FeatureExtractor():
                 self.features.append((wind_power, solar_power, hydro_power))
 
         #fill in self.energy_needed!!!!
-        #convert MW to watts
+        #convert MW to watts (* 1,000,000)
 
 
     def calculate_wind_power(self, wind_speed):
@@ -183,11 +183,10 @@ class Runner():
         """
         Calculates reward for given state based on how much coal used
         """
-        #energy needed that hour - how much coal we used that hour ==> 
+
         renewables = 0
         for power in features.getFeatures(state):
             renewables = renewables + power
-
         coal_used = features.getEnergyNeeded(state) - renewables
 
         return -1 * coal_used
