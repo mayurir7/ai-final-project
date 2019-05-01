@@ -33,7 +33,7 @@ class FeatureExtractor():
         #read in weather data from csv/call scraper
 
         #read in all days at once?
-        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day?
+        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of tuples
             for weather_tuple in forecast:
@@ -141,14 +141,12 @@ class ApproximateQLearner():
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
 
 class Runner():
-<<<<<<< HEAD
     def __init__(self):
         self.learner = ApproximateQLearner()
         self.features = FeatureExtractor()
         self.iterations = iterations
         self.state = State(0, 0)
     
-=======
     def __init__(self, iterations):
         self.learner = ApproximateQLearner()
         self.features = FeatureExtractor()
@@ -198,7 +196,7 @@ class Runner():
 
         coal_used = features.getEnergyNeeded(state) - renewables
 
-        return -coal_used
+        return -1 * coal_used
 
     def run(self):
         for idx in range(self.iterations):
