@@ -21,6 +21,8 @@ class State():
 class FeatureExtractor():
     def __init__(self):
         self.raw_data = []
+        self.features = []
+        self.energy_needed = [] #read in from excel sheet/json -- this is the energy needed [MW] per hour
         self.readData()
 
     def readData(self):
@@ -43,15 +45,16 @@ class FeatureExtractor():
 
         #convert weather to power (watts)
         #go through self.data and calculate power for the hour
-        hourly_power = []
         for day in self.raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
                 hydro_power = self.calculate_hydro_power()
-                hourly_power.append((wind_power, solar_power, hydro_power))
+                self.features.append((wind_power, solar_power, hydro_power))
 
-        self.features = hourly_power
+        #fill in self.energy_needed!!!!
+        #convert MW to watts
+
 
     def calculate_wind_power(self, wind_speed):
         #returns wind power in watts
@@ -86,6 +89,10 @@ class FeatureExtractor():
         index = ((state.day - 1) * 24) + (state.hour - 1)
         return self.features[index]
 
+    def getEnergyNeeded(self, state):
+        index = ((state.day - 1) * 24) + (state.hour - 1)
+        return self.energy_needed[index]
+
 class ApproximateQLearner():
     """
     self.weights: list storing the weights, index matches up with features
@@ -106,9 +113,9 @@ class ApproximateQLearner():
         Should return Q(state,action) = w * featureVector
         where * is the dotProduct operator
         """
-        featureVector = getFeatures()
+        featureVector = self.featExtractor.getFeatures()
         weight = self.getWeights()
-        result = weight * featureVector  #matrix multiply?
+        result = weight * featureVector
         return result
 
     def computeValueFromQValues(self, state):
@@ -131,20 +138,23 @@ class ApproximateQLearner():
         for feature in featureVector:
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
 
-    def calculateReward(self, state):
-        """
-        Calculates the reward for the given state
-        Reward should be a mix of balanced-ness of energy levels + 
-        """
-
 class Runner():
     def __init__(self):
         learner = ApproximateQLearner()
+        features = FeatureExtractor()
     
-    def calculateReward(self, state):
+    def calculateReward(self, state, action):
         """
         Calculates reward for given state based on how much coal used
         """
+        #energy needed that hour - how much coal we used that hour ==> 
+        renewables = 0
+        for power in features.getFeatures(state):
+            renewables = renewables + power
+
+        coal_used = features.getEnergyNeeded(state) - renewables
+
+        return -coal_used
 
 if __name__ == '__main__':
     test = FeatureExtractor()
