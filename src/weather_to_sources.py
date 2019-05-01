@@ -1,5 +1,6 @@
 from data_reader import WeatherData
 from data_reader import RandomReader
+from enums import EnergySource
 
 class State():
     """
