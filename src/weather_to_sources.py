@@ -30,9 +30,8 @@ class FeatureExtractor():
 
     def readData(self):
         """
-        Reads in weather data from a file and stores it (in self.raw_data)
+        Reads in weather data from a file and stores it
         """
-
         #read in weather data from csv/call scraper
 
         #read in all days at once?
@@ -56,7 +55,7 @@ class FeatureExtractor():
                 self.features.append((wind_power, solar_power, hydro_power))
 
         #fill in self.energy_needed!!!!
-        #convert MW to watts
+        #convert MW to watts (* 1,000,000)
 
 
     def calculate_wind_power(self, wind_speed):
@@ -225,7 +224,7 @@ class Runner():
         """
         Calculates reward for given state based on how much coal used
         """
-        #energy needed that hour - how much coal we used that hour ==> 
+
         renewables = 0
         for power in self.features.getFeatures(state):
             renewables = renewables + power
