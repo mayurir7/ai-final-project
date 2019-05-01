@@ -1,15 +1,14 @@
 from data_reader import WeatherData
 from data_reader import RandomReader
 
-
-
 class State():
     """
     State for the Q-learning situation
     """
-    def __init__(self):
+    def __init__(self, day, hour):
         self.energy_levels = [] #energy left, indexed by EnergySource enum
-        self.weather = []
+        self.day = day
+        self.hour = hour
 
     def updateEnergy(self, energy_used):
         """
@@ -20,12 +19,12 @@ class State():
 
 class FeatureExtractor():
     def __init__(self):
-        self.data = []
+        self.raw_data = []
         self.readData()
 
     def readData(self):
         """
-        Reads in weather data from a file and stores it (in self.data?)
+        Reads in weather data from a file and stores it (in self.raw_data)
         """
 
         #read in weather data from csv/call scraper
@@ -37,20 +36,21 @@ class FeatureExtractor():
             for weather_tuple in forecast:
                 #convert wind from miles/hour to meters/second
                 weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
-            self.data.append(forecast)
+            self.raw_data.append(forecast)
             weather_reader.advanceTime()
         
 
         #convert weather to power (watts)
         #go through self.data and calculate power for the hour
         hourly_power = []
-        for day in self.data:
+        for day in self.raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
                 hydro_power = self.calculate_hydro_power()
                 hourly_power.append((wind_power, solar_power, hydro_power))
 
+        self.features = hourly_power
 
     def calculate_wind_power(self, wind_speed):
         #returns wind power in watts
@@ -78,11 +78,12 @@ class FeatureExtractor():
 
         return efficiency*water_density*flow_rate*gravity_acceleration*height_diff
 
-    def next(self):
+    def getFeatures(self, state):
         """
-        Returns the features for the next hour timeslot
+        Returns the features for a given day and hour
         """
-        return None
+        index = ((state.day - 1) * 24) + (state.hour - 1)
+        return self.features[index]
 
 if __name__ == '__main__':
     test = FeatureExtractor()
