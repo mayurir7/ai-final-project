@@ -21,7 +21,7 @@ class State():
 
 class FeatureExtractor():
     def __init__(self):
-        self.weather_conditions = []
+        self.raw_data = []
         self.features = []
         self.energy_needed = [] #read in from excel sheet/json -- this is the energy needed [MW] per hour
         self.readData()
@@ -30,7 +30,6 @@ class FeatureExtractor():
         """
         Reads in weather data from a file and stores it
         """
-
         #read in weather data from csv/call scraper
 
         #read in all days at once?
@@ -40,13 +39,13 @@ class FeatureExtractor():
             for weather_tuple in forecast:
                 #convert wind from miles/hour to meters/second
                 weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
-            self.weather_conditions.append(forecast)
+            self.raw_data.append(forecast)
             weather_reader.advanceTime()
 
 
         #convert weather to power (watts)
         #go through self.data and calculate power for the hour
-        for day in self.weather_conditions:
+        for day in self.raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
