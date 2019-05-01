@@ -115,7 +115,7 @@ class FeatureExtractor():
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
                 hydro_power = self.calculate_hydro_power()
-                state.energy_levels[EnergySource.WIND.value] = wind_power
+                state.energy_levels[EnergySource.WIND.value] += wind_power
                 state.energy_levels[EnergySource.SOLAR.value] += solar_power
                 state.energy_levels[EnergySource.HYDRO.value] += hydro_power
 
