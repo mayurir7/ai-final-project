@@ -22,6 +22,8 @@ class State():
 class FeatureExtractor():
     def __init__(self):
         self.raw_data = []
+        self.features = []
+        self.energy_needed = [] #read in from excel sheet/json -- this is the energy needed [MW] per hour
         self.readData()
 
     def readData(self):
@@ -32,7 +34,7 @@ class FeatureExtractor():
         #read in weather data from csv/call scraper
 
         #read in all days at once?
-        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day?
+        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of tuples
             for weather_tuple in forecast:
@@ -44,15 +46,16 @@ class FeatureExtractor():
 
         #convert weather to power (watts)
         #go through self.data and calculate power for the hour
-        hourly_power = []
         for day in self.raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
                 hydro_power = self.calculate_hydro_power()
-                hourly_power.append((wind_power, solar_power, hydro_power))
+                self.features.append((wind_power, solar_power, hydro_power))
 
-        self.features = hourly_power
+        #fill in self.energy_needed!!!!
+        #convert MW to watts
+
 
     def calculate_wind_power(self, wind_speed):
         #returns wind power in watts
@@ -87,6 +90,10 @@ class FeatureExtractor():
         index = ((state.day - 1) * 24) + (state.hour - 1)
         return self.features[index]
 
+    def getEnergyNeeded(self, state):
+        index = ((state.day - 1) * 24) + (state.hour - 1)
+        return self.energy_needed[index]
+
 class ApproximateQLearner():
     """
     self.weights: list storing the weights, index matches up with features
@@ -109,9 +116,9 @@ class ApproximateQLearner():
         Should return Q(state,action) = w * featureVector
         where * is the dotProduct operator
         """
-        featureVector = getFeatures()
+        featureVector = self.featExtractor.getFeatures()
         weight = self.getWeights()
-        result = weight * featureVector  #matrix multiply?
+        result = weight * featureVector
         return result
 
     def computeValueFromQValues(self, state):
@@ -134,17 +141,12 @@ class ApproximateQLearner():
         for feature in featureVector:
             self.weights[feature] = self.getWeights()[feature] + (self.alpha * difference * featureVector[feature])
 
-    def calculateReward(self, state):
-        """
-        Calculates the reward for the given state
-        Reward should be a mix of balanced-ness of energy levels + 
-        """
-
 class Runner():
     def __init__(self, iterations, max_energy_needed):
         self.learner = ApproximateQLearner()
         self.features = FeatureExtractor()
         self.iterations = iterations
+        # TODO: fill in state to have some initial energy values
         self.state = State(0, 0)
         self.action_space = self.generateLegalActions(max_energy_needed)
 
@@ -174,7 +176,7 @@ class Runner():
 
     def iterate(self):
         # get energy needed for that day/hour
-        energy_needed = self.features.getEnergyNeeded(self.state.day, self.state.hour)
+        energy_needed = self.features.getEnergyNeeded(self.state)
         # get legal actions and set in Q-learner
         legalActions = self.getLegalActions(energy_needed)
         self.learner.setLegalActions(legalActions)
@@ -191,6 +193,14 @@ class Runner():
         """
         Calculates reward for given state based on how much coal used
         """
+        #energy needed that hour - how much coal we used that hour ==> 
+        renewables = 0
+        for power in features.getFeatures(state):
+            renewables = renewables + power
+
+        coal_used = features.getEnergyNeeded(state) - renewables
+
+        return -1 * coal_used
 
     def run(self):
         for idx in range(self.iterations):

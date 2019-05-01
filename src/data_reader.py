@@ -1,6 +1,6 @@
 import random
 
-FORECAST_LIMIT = 10
+FORECAST_LIMIT = 24
 
 #Class for holding Weather Data, windSpeed is in MPH and sunlight is a percentage in range [0, 1]
 class WeatherData:
