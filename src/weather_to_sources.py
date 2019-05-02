@@ -125,11 +125,11 @@ class ApproximateQLearner():
     self.weights: list storing the weights, index matches up with features
     """
 
-    def __init__(self):
+    def __init__(self, alpha, discount):
         self.weights = [random.random() for _ in range(len(WeatherConditions))]
         self.featExtractor = FeatureExtractor()
-        self.discount = 0.1
-        self.alpha = 0.01
+        self.discount = discount
+        self.alpha = alpha
         self.legalActions = []
 
     def setLegalActions(self, actions):
@@ -143,11 +143,12 @@ class ApproximateQLearner():
         Should return Q(state,action) = w * featureVector
         where * is the dotProduct operator
         """
+        action = list(action)
         featureVector = self.featExtractor.getFeatures(state)
         weight = self.getWeights()
         result = 0.0
         for idx in range(len(featureVector)):
-            result += featureVector[idx] * weight[idx]
+            result += (featureVector[idx] - action[idx]) * weight[idx]
         return result
 
     def computeValueFromQValues(self, state):
@@ -155,7 +156,7 @@ class ApproximateQLearner():
         Returns Q value that comes from taking optimal action in this state
         """
         maxVal = 0
-        for action in range(len(EnergySource)):
+        for action in self.legalActions:
             temp = self.getQValue(state, action)
             if temp > maxVal:
                 maxVal = temp
@@ -167,12 +168,16 @@ class ApproximateQLearner():
         """
         featureVector = self.featExtractor.getFeatures(state)
         difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state, action)
+        print self.getQValue(state, action) , self.computeValueFromQValues(nextState)
         for idx in range(len(featureVector)):
             self.weights[idx] = self.weights[idx] + (self.alpha * difference * featureVector[idx])
+        # normalize weights because everything is a hack
+        self.weights = [float(i) / sum(self.weights) for i in self.weights]
 
 class Runner():
-    def __init__(self, iterations, max_energy_needed):
-        self.learner = ApproximateQLearner()
+    def __init__(self, iterations, max_energy_needed, epsilon, alpha, discount):
+        self.epsilon = epsilon
+        self.learner = ApproximateQLearner(alpha, discount)
         self.features = FeatureExtractor()
         self.iterations = iterations
         self.state = State(0, 0)
@@ -192,18 +197,24 @@ class Runner():
                 actions.append((s, w, h))
         return actions
 
-    def getOptimalAction(self, state, actions):
-        bestAction = None
-        bestQVal = None
-        for action in actions:
-            qval = self.learner.getQValue(state, action)
-            if bestQVal == None:
-                bestAction = action
-                bestQVal = qval
-            elif qval >= bestQVal:
-                bestAction = action
-                bestQVal = qval
-        return bestAction
+    def getAction(self, state, actions, epsilon):
+        if random.random() <= epsilon:
+            # choose random action
+            index = (int)(random.random() * len(actions))
+            return actions[index]
+        else:
+            # choose optimal action
+            bestAction = None
+            bestQVal = None
+            for action in actions:
+                qval = self.learner.getQValue(state, action)
+                if bestQVal == None:
+                    bestAction = action
+                    bestQVal = qval
+                elif qval >= bestQVal:
+                    bestAction = action
+                    bestQVal = qval
+            return bestAction
 
     def iterate(self):
         # get energy needed for that day/hour
@@ -212,7 +223,7 @@ class Runner():
         legalActions = self.getLegalActions(energy_needed)
         self.learner.setLegalActions(legalActions)
         # take optimal action
-        action = self.getOptimalAction(self.state, legalActions)
+        action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
         nextState = self.state
         if nextState.hour > 24:
@@ -249,6 +260,7 @@ class Runner():
             print self.state.energy_levels , "\n" # logging
 
 if __name__ == '__main__':
-    test = Runner(1000, 70000)
+    # iterations, max energy, epsilon, alpha, discount
+    test = Runner(1000, 70000, 0.5, 0.01, 0.5)
     print "STARTING WEIGHTS: " , test.learner.weights
     test.run()
