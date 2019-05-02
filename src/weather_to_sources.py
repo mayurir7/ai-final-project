@@ -12,7 +12,7 @@ class State():
         self.energy_levels = [0, 0, 0] #energy left, indexed by EnergySource enum
         self.day = day
         self.hour = hour
-        FeatureExtractor().initializeState(self, RandomReader(365 * 5))
+        FeatureExtractor().initializeState(self, RandomReader(365 * 10))
 
     def getWind(self):
         return self.energy_levels[EnergySource.WIND.value]
@@ -37,7 +37,7 @@ class FeatureExtractor():
         #read in weather data from csv/call scraper
 
         #read in all days at once?
-        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day
+        weather_reader = RandomReader(365 * 5) #365 days, with 24 tuples of (wind,sun) in each day
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of tuples
             for weather_tuple in forecast:
@@ -58,7 +58,7 @@ class FeatureExtractor():
 
         #fill in self.energy_needed!!!!
         #convert MW to watts (* 1,000,000)
-        for idx in range(0, 365 * 24): #TODO: make this actually read in data
+        for idx in range(0, 365 * 24 * 5): #TODO: make this actually read in data
             self.energy_needed.append(50000)
 
     def calculate_wind_power(self, wind_speed):
@@ -92,7 +92,9 @@ class FeatureExtractor():
         Returns the features for a given day and hour
         """
         index = ((state.day - 1) * 24) + (state.hour - 1)
-        return self.features[index]
+        features = self.features[index]
+        features = features + (-10,)
+        return features
 
     def getEnergyNeeded(self, state):
         index = ((state.day - 1) * 24) + (state.hour - 1)
@@ -128,7 +130,7 @@ class ApproximateQLearner():
     """
 
     def __init__(self, alpha, discount):
-        self.weights = [random.random() for _ in range(len(WeatherConditions))]
+        self.weights = [random.random() for _ in range(len(WeatherConditions) + 1)]
         self.featExtractor = FeatureExtractor()
         self.discount = discount
         self.alpha = alpha
@@ -140,37 +142,40 @@ class ApproximateQLearner():
     def getWeights(self):
         return self.weights
 
-    def getQValue(self, state, action):
+    def getQValue(self, state, action, energy_needed):
         """
         Should return Q(state,action) = w * featureVector
         where * is the dotProduct operator
         """
-        action = list(action)
+        #action = list(action)
         featureVector = self.featExtractor.getFeatures(state)
         weight = self.getWeights()
         result = 0.0
         for idx in range(len(featureVector)):
-            result += (featureVector[idx] - action[idx]) * weight[idx]
+            if action == idx:
+                result += (featureVector[idx] - energy_needed) * weight[idx]
+            else:
+                result += featureVector[idx] * weight[idx]
         return result
 
-    def computeValueFromQValues(self, state):
+    def computeValueFromQValues(self, state, energy_needed):
         """
         Returns Q value that comes from taking optimal action in this state
         """
         maxVal = 0
         for action in self.legalActions:
-            temp = self.getQValue(state, action)
+            temp = self.getQValue(state, action, energy_needed)
             if temp > maxVal:
                 maxVal = temp
         return maxVal
 
-    def update(self, state, action, nextState, reward):
+    def update(self, state, action, nextState, reward, energy_needed):
         """
         Should update your weights based on transition
         """
         featureVector = self.featExtractor.getFeatures(state)
-        difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state, action)
-        print self.getQValue(state, action) , self.computeValueFromQValues(nextState)
+        difference = reward + (self.discount * self.computeValueFromQValues(nextState, energy_needed)) - self.getQValue(state, action, energy_needed)
+        #print self.getQValue(state, action, energy_needed) , self.computeValueFromQValues(nextState, energy_needed)
         for idx in range(len(featureVector)):
             self.weights[idx] = self.weights[idx] + (self.alpha * difference * featureVector[idx])
         # normalize weights because everything is a hack
@@ -194,9 +199,10 @@ class Runner():
 
     def getLegalActions(self, energy_needed):
         actions = []
-        for (w, s, h) in self.action_space:
-            if s + w + h <= energy_needed and self.state.getWind() >= w  and self.state.getSolar() >= s and self.state.getHydro() >= h:
-                actions.append((w, s, h))
+        for action in EnergySource:
+            if energy_needed <= self.state.energy_levels[action.value]:
+                actions.append(action.value)
+        actions.append(3) # coal is always an option
         return actions
 
     def getAction(self, state, actions, epsilon):
@@ -209,7 +215,7 @@ class Runner():
             bestAction = None
             bestQVal = None
             for action in actions:
-                qval = self.learner.getQValue(state, action)
+                qval = self.learner.getQValue(state, action, self.features.getEnergyNeeded(state))
                 if bestQVal == None:
                     bestAction = action
                     bestQVal = qval
@@ -218,7 +224,7 @@ class Runner():
                     bestQVal = qval
             return bestAction
 
-    def iterate(self):
+    def iterate(self, iteration):
         # get energy needed for that day/hour
         energy_needed = self.features.getEnergyNeeded(self.state)
         # get legal actions and set in Q-learner
@@ -234,36 +240,46 @@ class Runner():
         else:
             nextState.hour += 1
         for idx in range(len(nextState.energy_levels)):
-            nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
+            if idx == action:
+                nextState.energy_levels[idx] -= energy_needed
+            nextState.energy_levels[idx] += self.features.getFeatures(self.state)[idx]
+            #nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
         # learn from it
         reward = self.calculateReward(self.state, action)
-        self.learner.update(self.state, action, nextState, reward)
+        self.learner.update(self.state, action, nextState, reward, energy_needed)
         self.state = nextState
-        print "ACTION: " , action
-        print "WEIGHTS: ", self.learner.weights
-        print "FEATURES: ", self.features.getFeatures(self.state)
+        """
+        if action != 3:
+            print iteration / (24)
+            print "ACTION: " , ("coal" if action == 3 else (EnergySource)(action))
+            print "WEIGHTS: ", self.learner.weights
+            print "FEATURES: ", self.features.getFeatures(self.state) , "\n"
+            print self.state.energy_levels , "\n"
+        """
 
     def calculateReward(self, state, action):
         """
         Calculates reward for given state based on how much coal used
         """
 
-        renewables = 0
-        for power in action:
-            renewables = renewables + power
+        #renewables = 0
+        #for power in action:
+        #    renewables = renewables + power
 
-        coal_used = self.features.getEnergyNeeded(state) - renewables
-
-        return 1 / coal_used
+        #coal_used = self.features.getEnergyNeeded(state) - renewables
+        if action == 3:
+            return 0
+        for energy in self.state.energy_levels:
+            if energy <= self.features.getEnergyNeeded(self.state):
+                return 5000
+        return 10000
 
     def run(self):
         for idx in range(self.iterations):
-            self.iterate()
-            print self.state.energy_levels , "\n" # logging
+            self.iterate(idx)
+        print "ENDING WEIGHTS: " , self.learner.weights
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
-    test = Runner(1000, 70000, 0.5, 0.01, 0.5)
-    print "STARTING WEIGHTS: " , test.learner.weights
-    print test.state.energy_levels
+    test = Runner(365*24*5, 70000, 0.2, 0.01, 0.5)
     test.run()
