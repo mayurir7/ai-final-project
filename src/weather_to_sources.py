@@ -12,14 +12,16 @@ class State():
         self.energy_levels = [0, 0, 0] #energy left, indexed by EnergySource enum
         self.day = day
         self.hour = hour
-        FeatureExtractor().initializeState(self, RandomReader(50))
+        FeatureExtractor().initializeState(self, RandomReader(365 * 5))
 
-    def updateEnergy(self, energy_used):
-        """
-        Pass in array of amounts of energy consumed, indexed by EnergySource
-        """
-        for index in range(len(energy_levels)):
-            energy_levels[index] = energy_levels[index] - energy_used[index]
+    def getWind(self):
+        return self.energy_levels[EnergySource.WIND.value]
+    
+    def getSolar(self):
+        return self.energy_levels[EnergySource.SOLAR.value]
+
+    def getHydro(self):
+        return self.energy_levels[EnergySource.HYDRO.value]
 
 class FeatureExtractor():
     def __init__(self):
@@ -192,9 +194,9 @@ class Runner():
 
     def getLegalActions(self, energy_needed):
         actions = []
-        for (s, w, h) in self.action_space:
-            if s + w + h <= energy_needed:
-                actions.append((s, w, h))
+        for (w, s, h) in self.action_space:
+            if s + w + h <= energy_needed and self.state.getWind() >= w  and self.state.getSolar() >= s and self.state.getHydro() >= h:
+                actions.append((w, s, h))
         return actions
 
     def getAction(self, state, actions, epsilon):
@@ -263,4 +265,5 @@ if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
     test = Runner(1000, 70000, 0.5, 0.01, 0.5)
     print "STARTING WEIGHTS: " , test.learner.weights
+    print test.state.energy_levels
     test.run()
