@@ -3,6 +3,8 @@ from data_reader import RandomReader
 from enums import EnergySource, WeatherConditions
 import itertools
 import random
+import pickle
+import os
 
 class State():
     """
@@ -23,10 +25,11 @@ class State():
     def getHydro(self):
         return self.energy_levels[EnergySource.HYDRO.value]
 
+
 class FeatureExtractor():
     def __init__(self):
-        self.raw_data = []
-        self.features = []
+        self.raw_data = []  #holds the weather conditions
+        self.features = []  #holds wind, solar, hydro energy in MW
         self.energy_needed = [] #read in from excel sheet/json -- this is the energy needed [MW] per hour
         self.readData()
 
@@ -34,7 +37,6 @@ class FeatureExtractor():
         """
         Reads in weather data from a file and stores it
         """
-        #read in weather data from csv/call scraper
 
         #read in all days at once?
         weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day
@@ -47,8 +49,7 @@ class FeatureExtractor():
             weather_reader.advanceTime()
 
 
-        #convert weather to power (watts)
-        #go through self.data and calculate power for the hour
+        #convert weather to power (mega watts)
         for day in self.raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
@@ -56,13 +57,12 @@ class FeatureExtractor():
                 hydro_power = self.calculate_hydro_power()
                 self.features.append((wind_power, solar_power, hydro_power))
 
-        #fill in self.energy_needed!!!!
-        #convert MW to watts (* 1,000,000)
+        #read in self.energy_needed from csv!!!
         for idx in range(0, 365 * 24): #TODO: make this actually read in data
             self.energy_needed.append(50000)
 
     def calculate_wind_power(self, wind_speed):
-        #returns wind power in watts
+        #returns wind power in mega watts
 
         air_density = 1 #could change but isn't that important
         area = 7853 #(max in texas onshore is 130 feet diameter, radius = 50ft, pi*r^2 == 7853)
@@ -70,14 +70,14 @@ class FeatureExtractor():
 
 
     def calculate_solar_power(self, sun_hours):
-        #returns solar power in watts
+        #returns solar power in mega watts
 
         fudge_factor = .75
         panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capactity in Travis county)
         return (panel_wattage*sun_hours*fudge_factor) / 1000000.0
 
     def calculate_hydro_power(self):
-        #returns hydro power in watts
+        #returns hydro power in mega watts
 
         efficiency = .8 #average hydroelectric plant efficiency
         water_density = 997
@@ -95,6 +95,9 @@ class FeatureExtractor():
         return self.features[index]
 
     def getEnergyNeeded(self, state):
+        """
+        Returns the energy needed for a given day and hour
+        """
         index = ((state.day - 1) * 24) + (state.hour - 1)
         return self.energy_needed[index]
 
@@ -111,8 +114,7 @@ class FeatureExtractor():
             raw_data.append(forecast)
             weather_reader.advanceTime()
 
-        # convert weather to power (watts)
-        # go through self.data and calculate power for the hour
+        # convert weather to power (mega watts)
         for day in raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
@@ -121,6 +123,7 @@ class FeatureExtractor():
                 state.energy_levels[EnergySource.WIND.value] += wind_power
                 state.energy_levels[EnergySource.SOLAR.value] += solar_power
                 state.energy_levels[EnergySource.HYDRO.value] += hydro_power
+
 
 class ApproximateQLearner():
     """
@@ -170,7 +173,8 @@ class ApproximateQLearner():
         """
         featureVector = self.featExtractor.getFeatures(state)
         difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state, action)
-        print self.getQValue(state, action) , self.computeValueFromQValues(nextState)
+        print "Q VALUE: ", self.getQValue(state, action)
+        print "VALUE FROM Q VALUE: ", self.computeValueFromQValues(nextState)
         for idx in range(len(featureVector)):
             self.weights[idx] = self.weights[idx] + (self.alpha * difference * featureVector[idx])
         # normalize weights because everything is a hack
@@ -189,13 +193,14 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        incr = max_energy_needed / 100 if max_energy_needed > 100 else 1
-        return [item for item in itertools.product(range(0, max_energy_needed, incr), repeat=3)]
+        incr = max_energy_needed / 500 if max_energy_needed > 500 else 1
+        result = [item for item in itertools.product(range(0, max_energy_needed, incr), repeat=3)]
+        return result
 
     def getLegalActions(self, energy_needed):
         actions = []
         for (w, s, h) in self.action_space:
-            if s + w + h <= energy_needed and self.state.getWind() >= w  and self.state.getSolar() >= s and self.state.getHydro() >= h:
+            if s + w + h <= energy_needed and self.state.getWind() >= w and self.state.getSolar() >= s and self.state.getHydro() >= h:
                 actions.append((w, s, h))
         return actions
 
@@ -233,8 +238,10 @@ class Runner():
             nextState.hour = 1
         else:
             nextState.hour += 1
+        
         for idx in range(len(nextState.energy_levels)):
             nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
+        
         # learn from it
         reward = self.calculateReward(self.state, action)
         self.learner.update(self.state, action, nextState, reward)
@@ -259,11 +266,23 @@ class Runner():
     def run(self):
         for idx in range(self.iterations):
             self.iterate()
-            print self.state.energy_levels , "\n" # logging
+            print "ENERGY LEVELS: ", self.state.energy_levels # logging
+
+
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
     test = Runner(1000, 70000, 0.5, 0.01, 0.5)
     print "STARTING WEIGHTS: " , test.learner.weights
-    print test.state.energy_levels
+    print "STARTING ENERGY LEVELS: ", test.state.energy_levels
     test.run()
+
+
+    #pipe final weights to a file
+    output_dir = "../src"
+    output_filename = 'final_weights.txt'
+    output_file = os.path.join(output_dir, output_filename)
+    with open(output_file, 'wb') as f:
+        # f.write(test.learner.weights)
+        pickle.dump(test.learner.weights, f)
+        
