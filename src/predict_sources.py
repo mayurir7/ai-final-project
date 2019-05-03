@@ -1,6 +1,7 @@
 from data_reader import WeatherData
 from data_reader import RandomReader
 from weather_to_sources import FeatureExtractor
+from weather_to_sources import State
 from enums import EnergySource, WeatherConditions
 import itertools
 import random
