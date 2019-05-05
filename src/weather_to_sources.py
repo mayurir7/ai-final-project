@@ -1,5 +1,6 @@
 from data_reader import WeatherData
 from data_reader import RandomReader
+from data_reader import DataReader
 from enums import EnergySource, WeatherConditions
 import itertools
 import random
@@ -38,10 +39,9 @@ class FeatureExtractor():
         Reads in weather data from a file and stores it
         """
 
-        #read in all days at once?
-        weather_reader = RandomReader(365) #365 days, with 24 tuples of (wind,sun) in each day
+        weather_reader = DataReader()
         while weather_reader.canGetForecast():
-            forecast = weather_reader.getForecast() #forecast = list of tuples
+            forecast = weather_reader.getForecast() #forecast = list of tuples of (windSpeed, sunlight, energy_needed)
             for weather_tuple in forecast:
                 #convert wind from miles/hour to meters/second
                 weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
@@ -56,10 +56,8 @@ class FeatureExtractor():
                 solar_power = self.calculate_solar_power(weather_tuple.sunlight)
                 hydro_power = self.calculate_hydro_power()
                 self.features.append((wind_power, solar_power, hydro_power))
+                self.energy_needed.append(weather_tuple.ERCOT)
 
-        #read in self.energy_needed from csv!!!
-        for idx in range(0, 365 * 24): #TODO: make this actually read in data
-            self.energy_needed.append(50000)
 
     def calculate_wind_power(self, wind_speed):
         #returns wind power in mega watts
@@ -173,10 +171,11 @@ class ApproximateQLearner():
         """
         featureVector = self.featExtractor.getFeatures(state)
         difference = reward + (self.discount * self.computeValueFromQValues(nextState)) - self.getQValue(state, action)
-        print "Q VALUE: ", self.getQValue(state, action)
-        print "VALUE FROM Q VALUE: ", self.computeValueFromQValues(nextState)
+        # print "Q VALUE: ", self.getQValue(state, action)
+        # print "VALUE FROM Q VALUE: ", self.computeValueFromQValues(nextState)
         for idx in range(len(featureVector)):
             self.weights[idx] = self.weights[idx] + (self.alpha * difference * featureVector[idx])
+        
         # normalize weights because everything is a hack
         self.weights = [float(i) / sum(self.weights) for i in self.weights]
 
@@ -261,7 +260,8 @@ class Runner():
 
         coal_used = self.features.getEnergyNeeded(state) - renewables
 
-        return 1 / coal_used
+        # return 1 / coal_used
+        return renewables
 
     def run(self):
         for idx in range(self.iterations):
@@ -283,6 +283,5 @@ if __name__ == '__main__':
     output_filename = 'final_weights.txt'
     output_file = os.path.join(output_dir, output_filename)
     with open(output_file, 'wb') as f:
-        # f.write(test.learner.weights)
         pickle.dump(test.learner.weights, f)
         
