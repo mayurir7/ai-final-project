@@ -1,18 +1,21 @@
 import random
+import math
 
 FORECAST_LIMIT = 24
-
+daysinmonth = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 #Class for holding Weather Data, windSpeed is in MPH and sunlight is a percentage in range [0, 1]
 class WeatherData:
     windSpeed = 0
     sunlight = 0
-    def __init__(self, _windSpeed, _sunlight):
+    ERCOT = 0
+    def __init__(self, _windSpeed, _sunlight, _ERCOT):
         self.windSpeed = _windSpeed
         self.sunlight = _sunlight
+        self.ERCOT = _ERCOT
     def __repr__(self):
-        return (self.windSpeed, self.sunlight).__str__()
+        return (self.windSpeed, self.sunlight, self.ERCOT).__str__()
     def __str__(self):
-        return (self.windSpeed, self.sunlight).__str__()
+        return (self.windSpeed, self.sunlight, self.ERCOT).__str__()
 
 #Below are the public functions for a Reader
 class Reader:
@@ -50,7 +53,137 @@ class RandomReader(Reader):
         self.data[FORECAST_LIMIT - 1] = self._genRandom()
         self.time = self.time + 1
     def _genRandom(self):
-        return WeatherData(random.random() * 20, random.random())
+        return WeatherData(random.random() * 20, random.random(), 25000 + random.random() * 25000)
+
+class DataReader(Reader):
+    time = 0
+    data = []
+    def canGetForecast(self):
+        return len(self.data) >= FORECAST_LIMIT + self.time
+    def getForecast(self):
+        return self.data[self.time : (self.time + FORECAST_LIMIT)]
+    def advanceTime(self):
+        self.time = self.time + 1
+    def __init__(self):
+        self.time = 0
+        self.data = []
+        emap = dict()
+        f = open("../data/2018load.csv")
+        skip = True
+        for row in f:
+            if skip:
+                skip = False
+                continue
+            data = row.split(",")
+            date, time = data[0].strip().split(" ")
+            month, day, year = map(int, date.split("/"))
+            hour = int(time.split(":")[0])
+            if month == 11 and day >= 2:
+                break
+            ercot = float(data[9].strip())
+            emap[(month, day, year, hour)] = ercot
+        f.close()
+        f = open("../data/10months.txt")
+        month = 1
+        day = 1
+        year = 2018
+        lasthour = 0
+        skip = True
+        conds = set()
+        for row in f:
+            time, temp, windspeed, cond = row.split(",")
+            time = time.strip()
+            hour, minute = time.split(":")
+            hour = int(hour)
+            if skip:
+                if hour == 0:
+                    skip = False
+                else:
+                    continue
+            temp = int(temp.strip())
+            windspeed = int(windspeed.strip())
+            cond = cond.strip()
+            suntime = math.sqrt(max(0, math.sin((3.141592 / 12) * hour)))
+            suncond = 1
+            if(cond == "Fair"):
+                suncond = 1
+            elif(cond == "Fair / Windy"):
+                suncond = 1
+            elif(cond == "Light Drizzle"):
+                sundcond = .8
+            elif(cond == "Mostly Cloudy"):
+                suncond = .7
+            elif(cond == "Thunder"):
+                suncond = .5
+            elif(cond == "T-Storm"):
+                suncond = .5
+            elif(cond == "Light Rain / Windy"):
+                suncond = .9
+            elif(cond == "Haze"):
+                suncond = .9
+            elif(cond == "Fog"):
+                suncond = .8
+            elif(cond == "Mostly Cloudy / Windy"):
+                suncond = .7
+            elif(cond == "Heavy T-Storm / Windy"):
+                suncond = .3
+            elif(cond == "Squalls / Windy"):
+                suncond = .7
+            elif(cond == "Thunder in the Vicinity"):
+                suncond = 1
+            elif(cond == "Light Rain"):
+                suncond = .9
+            elif(cond == "Rain"):
+                suncond = .7
+            elif(cond == "Patches of Fog"):
+                suncond = .9
+            elif(cond == "T-Storm / Windy"):
+                suncond = .5
+            elif(cond == "N/A"):
+                suncond = 1
+            elif(cond == "Cloudy / Windy"):
+                suncond = .8
+            elif(cond == "Partly Cloudy / Windy"):
+                suncond = .9
+            elif(cond == "Heavy Rain"):
+                suncond = .5
+            elif(cond == "Cloudy"):
+                suncond = .8
+            elif(cond == "Squalls"):
+                suncond = .7
+            elif(cond == "Rain / Windy"):
+                suncond = .7
+            elif(cond == "Light Drizzle / Windy"):
+                suncond = .95
+            elif(cond == "Light Rain with Thunder"):
+                suncond = .5
+            elif(cond == "Heavy T-Storm"):
+                suncond = .3
+            elif(cond == "Heavy Rain / Windy"):
+                suncond = .5
+            elif(cond == "Partly Cloudy"):
+                suncond = .9
+            elif(cond == "Mist"):
+                suncond = .8
+            elif(cond == "Haze / Windy"):
+                suncond = .8
+            #else:
+            #    conds.add(cond)
+            if(hour == 0 and lasthour != 0):
+                day = day + 1
+                if(day > daysinmonth[month]):
+                    day = 1
+                    month = month + 1
+            if(month == 3 and day == 11 and year == 2018 and (hour + 1) == 3):
+                #DST
+                continue
+            wd = WeatherData(windspeed, suntime * suncond, emap[(month, day, year, hour + 1)])
+            if(hour == lasthour and len(self.data) > 0):
+                self.data[len(self.data) - 1] = wd
+            else:
+                self.data.append(wd)
+            lasthour = hour
+        f.close()
 
 
 #Sample Code on a RandomReader
@@ -59,3 +192,10 @@ class RandomReader(Reader):
 #    forecast = rr.getForecast()
 #    print(forecast)
 #    rr.advanceTime()
+
+#Sample Code on a DataReader
+#dr = DataReader()
+#while dr.canGetForecast():
+#    forecast = dr.getForecast()
+#    print(forecast)
+#    dr.advanceTime()
