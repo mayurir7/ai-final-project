@@ -76,7 +76,7 @@ class DataReader(Reader):
         return self.data[self.time : (self.time + FORECAST_LIMIT)]
     def advanceTime(self):
         self.time = self.time + 1
-    def __init__(self):
+    def __init__(self, path_to_data="../data/10monthsV2.txt"):
         self.time = 0
         self.data = []
         emap = dict()
@@ -95,7 +95,7 @@ class DataReader(Reader):
             ercot = float(data[9].strip())
             emap[(month, day, year, hour)] = ercot
         f.close()
-        f = open("../data/10monthsV2.txt")
+        f = open(path_to_data)
         #month = 1
         #day = 1
         #year = 2018
@@ -210,8 +210,8 @@ class DataReader(Reader):
 #    rr.advanceTime()
 
 #Sample Code on a DataReader
-dr = DataReader()
-while dr.canGetForecast():
-    forecast = dr.getForecast()
-    print(forecast)
-    dr.advanceTime()
+# dr = DataReader()
+# while dr.canGetForecast():
+#     forecast = dr.getForecast()
+#     print(forecast)
+#     dr.advanceTime()

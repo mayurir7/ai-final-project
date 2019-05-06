@@ -29,20 +29,24 @@ class State():
 
 
 class FeatureExtractor():
-    def __init__(self, path_to_csv=None): #path is optional, if no path, do randomReader
+    def __init__(self, path_to_data=None): #path is optional, if no path, do randomReader
         self.raw_data = []  #holds the weather conditions
         self.features = []  #holds (wind, solar, hydro) in MW
         self.energy_needed = [] #holds needed in MW per hour
-        self.readData(path_to_csv)
+        self.readData(path_to_data)
 
-    def readData(self, path_to_csv):
+    def readData(self, path_to_data):
         """
         Reads in weather data from a file and stores it
         """
 
-        if path_to_csv == None:
+        if path_to_data == None:
             weather_reader = RandomReader(365)
-            while weather_reader.canGetForecast():
+
+        else:
+            weather_reader = DataReader(path_to_data) #TODO change DataReader init to take this?
+
+        while weather_reader.canGetForecast():
                 forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
                 for weather_tuple in forecast:
                     #convert wind from miles/hour to meters/second
@@ -50,15 +54,9 @@ class FeatureExtractor():
                 self.raw_data.append(forecast)
                 weather_reader.advanceTime()
 
-        else:
-            with open(path_to_csv) as csv_file:
-                csv_reader = csv.reader(csv_file, delimiter=',')
-                for row in csv_reader:
-                    weather_tuple = (row,)
-                    self.raw_data.append(weather_tuple)
 
 
-        #convert weather to power (mega watts)
+        #convert weather to power
         for day in self.raw_data:
             for weather_tuple in day:
                 wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
@@ -202,10 +200,10 @@ class ApproximateQLearner():
         self.weights = [float(i) / sum(self.weights) for i in self.weights]
 
 class Runner():
-    def __init__(self, iterations, max_energy_needed, epsilon, alpha, discount):
+    def __init__(self, iterations, max_energy_needed, epsilon, alpha, discount, path_to_data=None):
         self.epsilon = epsilon
         self.learner = ApproximateQLearner(alpha, discount)
-        self.features = FeatureExtractor()
+        self.features = FeatureExtractor(path_to_data)
         self.iterations = iterations
         self.state = State(0, 0)
         self.action_space = self.generateLegalActions(max_energy_needed)
@@ -214,7 +212,7 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        incr = max_energy_needed / 500 if max_energy_needed > 500 else 1
+        incr = max_energy_needed / 500 if max_energy_needed > 500 else 50
         increments = range(0,100) + range(100, 1000, 50) + range(1000, 5000, incr)
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
@@ -295,10 +293,10 @@ class Runner():
         reward = self.calculateReward(self.state, action, self.learner.weights)
         self.learner.update(self.state, action, nextState, reward)
         self.state = nextState
-        print "ACTION: " , action
-        print "WEIGHTS: ", self.learner.weights
-        print "FEATURES: ", self.features.getFeatures(self.state)
-        print "ENERGY_NEEDED", energy_needed
+        # print "ACTION: " , action
+        # print "WEIGHTS: ", self.learner.weights
+        # print "FEATURES: ", self.features.getFeatures(self.state)
+        # print "ENERGY_NEEDED", energy_needed
 
     def calculateReward(self, state, action, weights):
         """
@@ -321,20 +319,20 @@ class Runner():
             if self.features.getEnergyNeeded(state) < level:
                 reduction = 50
 
-        print "REWARD", (1 / coal_used) + (10*renewables)
+        # print "REWARD", (1 / coal_used) + (10*renewables)
         return (1 / coal_used) + (10*renewables)
 
 
     def run(self):
         for idx in range(self.iterations):
             self.iterate()
-            print "ENERGY LEVELS: ", self.state.energy_levels # logging
+            # print "ENERGY LEVELS: ", self.state.energy_levels #logging
 
 
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
-    test = Runner(1000, 50000, 0.0, 0.1, 0.5)
+    test = Runner(1000, 500, 0.5, 0.1, 0.5)
     print "STARTING WEIGHTS: " , test.learner.weights
     print "STARTING ENERGY LEVELS: ", test.state.energy_levels
     test.run()
