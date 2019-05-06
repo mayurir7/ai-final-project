@@ -8,10 +8,12 @@ class WeatherData:
     windSpeed = 0
     sunlight = 0
     ERCOT = 0
-    def __init__(self, _windSpeed, _sunlight, _ERCOT):
+    def __init__(self, _windSpeed, _sunlight, _ERCOT, _sun, _temp):
         self.windSpeed = _windSpeed
         self.sunlight = _sunlight
         self.ERCOT = _ERCOT
+        self.sunForecast = _sun
+        self.temperature = _temp
     def __repr__(self):
         return (self.windSpeed, self.sunlight, self.ERCOT).__str__()
     def __str__(self):
@@ -177,7 +179,7 @@ class DataReader(Reader):
             if(month == 3 and day == 11 and year == 2018 and (hour + 1) == 3):
                 #DST
                 continue
-            wd = WeatherData(windspeed, suntime * suncond, emap[(month, day, year, hour + 1)])
+            wd = WeatherData(windspeed, suntime * suncond, emap[(month, day, year, hour + 1)], cond, temp)
             if(hour == lasthour and len(self.data) > 0):
                 self.data[len(self.data) - 1] = wd
             else:
