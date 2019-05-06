@@ -65,7 +65,7 @@ class RandomReader(Reader):
         self.data[FORECAST_LIMIT - 1] = self._genRandom()
         self.time = self.time + 1
     def _genRandom(self):
-        return WeatherData(random.random() * 20, random.random(), 25000 + random.random() * 25000, -1, -1, -1, -1, -1)
+        return WeatherData(random.random() * 20, random.random(), 25000 + random.random() * 25000, .5, 70, -1, -1, -1, -1, -1)
 
 class DataReader(Reader):
     time = 0
