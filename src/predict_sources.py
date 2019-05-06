@@ -8,10 +8,14 @@ import os
 
 
 class PredictSources():
-    def __init__(self):
+#read in csv, predict for each line, store prediction for each line
+
+    def __init__(self, path_to_csv=None):
         self.final_weights = self.getWeights()
         self.runner = Runner(1000, 500, 0.5, 0.01, 0.5)
-        self.prediction()
+        if path_to_csv is not None:
+            self.loadCSV(path_to_csv)
+        # self.prediction()
 
 
     def getWeights(self):
@@ -22,24 +26,30 @@ class PredictSources():
             final_weights = pickle.load(f)
         return final_weights
 
+    def loadCSV(self, path_to_csv):
+        with open(path_to_csv) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                weather_tuple = (row,)
+                self.raw_data.append(weather_tuple)
+                prediction(weather_tuple)
 
-    def prediction(self):
+
+
+
+
+    def prediction(self, weather_tuple): #pass in energy_needed, legalActions?, energy_levels? (should this be 0,0,0 at start or initialized?), 
         """
-        Returns which energy source will be used for this hour.
-
-        return how much of this energy source we can use???
+        Returns how much of each energy source we can use this hour.
         """
 
-        current_features = self.runner.features.getFeatures(self.runner.state)
+        # current_raw_data is given from the call from loadCSV?
 
-        prediction = [0 for i in range(3)]
+        current_raw_data, features, action, energy_levels = self.runner.predict_iterate()
+        return action
 
-        for i in range(len(self.final_weights)):
-            prediction[i] = self.final_weights[i]*current_features[i]
 
-        
-        source = prediction.index(max(prediction))
-        return EnergySource(source)
+
 
 if __name__ == '__main__':
     test = PredictSources()
