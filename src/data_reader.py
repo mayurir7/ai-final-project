@@ -95,15 +95,18 @@ class DataReader(Reader):
             ercot = float(data[9].strip())
             emap[(month, day, year, hour)] = ercot
         f.close()
-        f = open("../data/10months.txt")
-        month = 1
-        day = 1
-        year = 2018
+        f = open("../data/10monthsV2.txt")
+        #month = 1
+        #day = 1
+        #year = 2018
         lasthour = 0
         skip = True
         conds = set()
         for row in f:
-            time, temp, windspeed, cond = row.split(",")
+            month, day, year, time, temp, windspeed, cond = row.split(",")
+            month = int(month.strip())
+            day = int(day.strip())
+            year = int(year.strip())
             time = time.strip()
             hour, minute = time.split(":")
             hour = int(hour)
@@ -207,8 +210,8 @@ class DataReader(Reader):
 #    rr.advanceTime()
 
 #Sample Code on a DataReader
-#dr = DataReader()
-#while dr.canGetForecast():
-#    forecast = dr.getForecast()
-#    print(forecast)
-#    dr.advanceTime()
+dr = DataReader()
+while dr.canGetForecast():
+    forecast = dr.getForecast()
+    print(forecast)
+    dr.advanceTime()
