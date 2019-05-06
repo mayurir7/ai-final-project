@@ -120,6 +120,21 @@ class MainScreen(Screen):
         self.dropdown = CustomDropDown()
         self.dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         super(MainScreen, self).__init__(**kwargs)
+        # all arrays indexed in same order as enum [wind, solar, hydro, coal]
+        # properties that change given the date/time
+        self.date = "January 1, 2018"
+        self.hour = "11:00"
+        self.temp = 65
+        self.cloud_cover = "T-Storm"
+        self.wind_speed = 10 * 2.237
+        self.energy_gain = [0.5, 100.0, 0.786]
+        self.energy_loss = [0.0, 50.0, 0.0]
+        self.energy_levels = [0.6, 50.5, 1.3]
+        # properties that should not change once prediction is done
+        self.sum_total_energy_needed = 70000
+        self.sum_net_energy = [0, 10, 0]
+        self.sum_energy_used = [25, 150, 50, 69875]
+        self.sum_energy_saved = 225
 
     def on_pre_enter(self, *args):
         plt.style.use('dark_background')
