@@ -127,7 +127,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "1000 kwh"
+                    text: str(root.sum_total_energy_needed) + " Mwh"
                     text_size: self.size
                     font_name: "Segoe"
                     font_size: 10
@@ -162,7 +162,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "10.5 kwh"
+                    text: str(root.sum_net_energy[1]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c6)
                     font_name: "Segoe"
@@ -198,7 +198,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "4.7 kwh"
+                    text: str(root.sum_energy_used[1]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c6)
                     font_name: "Segoe"
@@ -234,7 +234,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "10.5 kwh"
+                    text: str(root.sum_net_energy[0]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c6)
                     font_name: "Segoe"
@@ -270,7 +270,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "4.7 kwh"
+                    text: str(root.sum_energy_used[0]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c6)
                     font_name: "Segoe"
@@ -306,7 +306,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "10.5 kwh"
+                    text: str(root.sum_net_energy[2]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c6)
                     font_name: "Segoe"
@@ -342,7 +342,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "4.7 kwh"
+                    text: str(root.sum_energy_used[2]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c6)
                     font_name: "Segoe"
@@ -378,7 +378,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "4.7 kwh"
+                    text: str(root.sum_energy_used[3]) + " Mwh"
                     text_size: self.size
                     color: utils.get_color_from_hex(root.c5)
                     font_name: "Segoe"
@@ -402,7 +402,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "right"
                     valign: "bottom"
-                    text: "200.5"
+                    text: str(root.sum_energy_saved)
                     text_size: self.size
                     font_name: "SegoeL"
                     font_size: 36
@@ -413,7 +413,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "left"
                     valign: "bottom"
-                    text: "kwh"
+                    text: "Mwh"
                     text_size: self.size
                     font_name: "SegoeL"
                     font_size: 20
@@ -460,7 +460,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "left"
                     valign: "bottom"
-                    text: "11:00"
+                    text: root.hour
                     text_size: self.size
                     font_name: "GothamM"
                     font_size: 32
@@ -481,7 +481,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "left"
                     valign: "bottom"
-                    text: "May 9, 2019"
+                    text: root.date
                     text_size: self.size
                     font_name: "GothamBook"
                     font_size: 18
@@ -563,7 +563,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "right"
                         valign: "bottom"
-                        text: "65°"
+                        text: str(root.temp) + "°"
                         text_size: self.size
                         font_name: "SegoeL"
                         font_size: 36
@@ -610,7 +610,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "center"
                         valign: "bottom"
-                        text: "Partly Cloudy"
+                        text: root.cloud_cover
                         text_size: self.size
                         font_name: "SegoeL"
                         font_size: 28
@@ -645,7 +645,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "right"
                         valign: "bottom"
-                        text: "15"
+                        text: str(root.wind_speed)
                         text_size: self.size
                         font_name: "SegoeL"
                         font_size: 36
@@ -751,7 +751,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "20%"
+                        text: str(sum(root.energy_gain)) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -796,7 +796,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "10%"
+                        text: str(sum(root.energy_loss)) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -881,7 +881,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "50%"
+                        text: str(root.energy_levels[1]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -926,7 +926,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "20%"
+                        text: str(root.energy_gain[1]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -971,7 +971,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "10%"
+                        text: str(root.energy_loss[1]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1055,7 +1055,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "25%"
+                        text: str(root.energy_levels[0]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1100,7 +1100,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "20%"
+                        text: str(root.energy_gain[0]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1145,7 +1145,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "10%"
+                        text: str(root.energy_loss[0]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1229,7 +1229,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "20%"
+                        text: str(root.energy_levels[2]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1274,7 +1274,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "20%"
+                        text: str(root.energy_gain[2]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1319,7 +1319,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: "10%"
+                        text: str(root.energy_loss[2]) + " Mwh"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
