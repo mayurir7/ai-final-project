@@ -8,16 +8,26 @@ class WeatherData:
     windSpeed = 0
     sunlight = 0
     ERCOT = 0
-    def __init__(self, _windSpeed, _sunlight, _ERCOT, _sun, _temp):
+    month = 0
+    day = 0
+    year = 0
+    hour = 0
+    minute = 0
+    def __init__(self, _windSpeed, _sunlight, _ERCOT, _sun, _temp, _month, _day, _year, _hour, _minute):
         self.windSpeed = _windSpeed
         self.sunlight = _sunlight
         self.ERCOT = _ERCOT
         self.sunForecast = _sun
         self.temperature = _temp
+        self.month = _month
+        self.day = _day
+        self.year = _year
+        self.hour = _hour
+        self.minute = _minute
     def __repr__(self):
-        return (self.windSpeed, self.sunlight, self.ERCOT).__str__()
+        return (self.windSpeed, self.sunlight, self.ERCOT, self.month, self.day, self.year, self.hour, self.minute).__str__()
     def __str__(self):
-        return (self.windSpeed, self.sunlight, self.ERCOT).__str__()
+        return (self.windSpeed, self.sunlight, self.ERCOT, self.month, self.day, self.year, self.hour, self.minute).__str__()
 
 #Below are the public functions for a Reader
 class Reader:
@@ -55,7 +65,7 @@ class RandomReader(Reader):
         self.data[FORECAST_LIMIT - 1] = self._genRandom()
         self.time = self.time + 1
     def _genRandom(self):
-        return WeatherData(random.random() * 20, random.random(), 25000 + random.random() * 25000)
+        return WeatherData(random.random() * 20, random.random(), 25000 + random.random() * 25000, -1, -1, -1, -1, -1)
 
 class DataReader(Reader):
     time = 0
@@ -97,6 +107,7 @@ class DataReader(Reader):
             time = time.strip()
             hour, minute = time.split(":")
             hour = int(hour)
+            minute = int(minute)
             if skip:
                 if hour == 0:
                     skip = False
@@ -179,7 +190,7 @@ class DataReader(Reader):
             if(month == 3 and day == 11 and year == 2018 and (hour + 1) == 3):
                 #DST
                 continue
-            wd = WeatherData(windspeed, suntime * suncond, emap[(month, day, year, hour + 1)], cond, temp)
+            wd = WeatherData(windspeed, suntime * suncond, emap[(month, day, year, hour + 1)], cond, temp, month, day, year, hour, minute)
             if(hour == lasthour and len(self.data) > 0):
                 self.data[len(self.data) - 1] = wd
             else:
