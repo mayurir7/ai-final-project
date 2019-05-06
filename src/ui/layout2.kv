@@ -1,0 +1,1472 @@
+#:kivy 1.10.0
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import utils kivy.utils
+BoxLayout:
+    ScreenManager:
+        transition: FadeTransition()
+        StartScreen:
+            name: 'start'
+        MainScreen:
+            name: 'main'
+
+<StartScreen>:
+    canvas:
+        Color: 
+            rgb: [.1, .1,.1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        Label:
+            text: "autogrid"
+            font_name: "Gotham"
+            font_size: 40
+            bold: True
+        Button:
+            text: "load data"
+            font_name: "Gotham"
+            font_size: 30
+            on_press: root.manager.current = 'main'
+
+<MainScreen>:
+    canvas:
+        Color: 
+            rgb: utils.get_color_from_hex(root.c3)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    FloatLayout:
+        #graph
+        RelativeLayout:
+            pos: 0, 0
+            FloatLayout:
+                size_hint: None, None
+                size: 800, 250
+                pos: 0, 0
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c3)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            RelativeLayout:
+                id: test
+                size_hint: None, None
+                pos: 3, 3
+                size: 794, 222
+            Label:
+                size_hint: None, None
+                halign: "right"
+                valign: "middle"
+                text: "Energy Efficiency"
+                text_size: self.size
+                font_name: "Avenir3"
+                font_size: 14
+                height: 25
+                width: 800 - 30 #padding
+                pos: 0, 225
+        #total report
+        RelativeLayout:
+            size_hint: None, None
+            pos: 0, 250
+            FloatLayout:
+                size_hint: None, None
+                size: 250, 345
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            FloatLayout:
+                size_hint: None, None
+                size: 250, 25
+                pos: 0, 345
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c3)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+                size_hint: None, None
+                halign: "center"
+                valign: "bottom"
+                text: "Results Summary"
+                text_size: self.size
+                font_name: "Avenir3"
+                font_size: 13
+                height: 25
+                width: 250
+                pos: 0, 350
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 315
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Total Energy Needed: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "1000 kwh"
+                    text_size: self.size
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 286
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Net Solar Energy: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "10.5 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c6)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 259
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Solar Energy Used: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "4.7 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c6)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 230
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Net Wind Energy: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "10.5 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c6)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 203
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Wind Energy Used: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "4.7 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c6)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 174
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Net Hydroelectric Energy: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "10.5 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c6)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 147
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Hydroelectric Energy Used: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "4.7 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c6)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 118
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 25
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "Nonrenewable Energy Used: "
+                    text_size: self.size
+                    font_name: "GothamM"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 10
+                    height: 25
+                    width: 200
+                    pos: 5, 7
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "4.7 kwh"
+                    text_size: self.size
+                    color: utils.get_color_from_hex(root.c5)
+                    font_name: "Segoe"
+                    font_size: 10
+                    height: 25
+                    width: 230
+                    pos: 0, 7
+            RelativeLayout:
+                size_hint: None, None
+                pos: 5, 3
+                FloatLayout:
+                    size_hint: None, None
+                    size: 240, 110
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "right"
+                    valign: "bottom"
+                    text: "200.5"
+                    text_size: self.size
+                    font_name: "SegoeL"
+                    font_size: 36
+                    height: 75
+                    width: 150
+                    pos: 0, 40
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "kwh"
+                    text_size: self.size
+                    font_name: "SegoeL"
+                    font_size: 20
+                    height: 75
+                    width: 80
+                    pos: 151, 45
+                Label:
+                    size_hint: None, None
+                    halign: "center"
+                    valign: "bottom"
+                    text: "Total Energy Saved"
+                    text_size: self.size
+                    font_name: "GothamB"
+                    color: utils.get_color_from_hex(root.c4)
+                    font_size: 9
+                    height: 15
+                    width: 240
+                    pos: 0, 30
+        #Day Report
+        RelativeLayout:
+            size_hint: None, None
+            pos: 250, 250
+            FloatLayout:
+                size_hint: None, None
+                size: 550, 370
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            #Time Widget
+            RelativeLayout:
+                size_hint: None, None
+                size: 550, 75
+                pos: 0, 300
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "11:00"
+                    text_size: self.size
+                    font_name: "GothamM"
+                    font_size: 32
+                    height: 75
+                    width: 100
+                    pos: 30, 10
+                FloatLayout:
+                    size_hint: None, None
+                    size: 1, 50
+                    pos: 125, 10
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c4)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "left"
+                    valign: "bottom"
+                    text: "May 9, 2019"
+                    text_size: self.size
+                    font_name: "GothamBook"
+                    font_size: 18
+                    height: 75
+                    width: 150
+                    pos: 140, 15
+                HoverButton:
+                    id: clock
+                    size_hint: None, None
+                    size: 30, 30
+                    pos: 510, 30
+                    background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
+                    background_down: 'images/ClockDefault.png'
+                HoverButton:
+                    id: calendar
+                    size_hint: None, None
+                    size: 30, 30
+                    pos: 475, 30
+                    background_normal: 'images/CalendarHover.png' if self.hovered else 'images/CalendarDefault.png'
+                    background_down: 'images/CalendarDefault.png'
+            #Conditions Widget
+            RelativeLayout:
+                size_hint: None, None
+                pos: 0, 0
+                FloatLayout:
+                    size_hint: None, None
+                    size: 250, 300
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c2)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                FloatLayout:
+                    size_hint: None, None
+                    size: 250, 25
+                    pos: 0, 275
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c3)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "center"
+                    valign: "bottom"
+                    text: "Weather Conditions"
+                    text_size: self.size
+                    font_name: "Avenir3"
+                    font_size: 13
+                    height: 25
+                    width: 250
+                    pos: 0, 280
+                Label:
+                    size_hint: None, None
+                    halign: "center"
+                    valign: "bottom"
+                    text: "Austin, TX"
+                    text_size: self.size
+                    font_name: "GothamB"
+                    font_size: 12
+                    height: 75
+                    width: 250
+                    pos: 0, 250
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 169
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 240, 78
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "bottom"
+                        text: "65°"
+                        text_size: self.size
+                        font_name: "SegoeL"
+                        font_size: 36
+                        height: 75
+                        width: 150
+                        pos: 0, 20
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "F"
+                        text_size: self.size
+                        font_name: "GothamBook"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 14
+                        height: 75
+                        width: 240
+                        pos: 25, 27
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Temperature"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 240
+                        pos: 0, 10
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 86
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 240, 80
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Partly Cloudy"
+                        text_size: self.size
+                        font_name: "SegoeL"
+                        font_size: 28
+                        height: 75
+                        width: 240
+                        pos: 0, 25
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Cloud Cover"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 240
+                        pos: 0, 10
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 3
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 240, 80
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "bottom"
+                        text: "15"
+                        text_size: self.size
+                        font_name: "SegoeL"
+                        font_size: 36
+                        height: 75
+                        width: 119
+                        pos: 0, 20
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "bottom"
+                        text: "mph"
+                        text_size: self.size
+                        font_name: "SegoeL"
+                        font_size: 20
+                        height: 75
+                        width: 80
+                        pos: 121, 25
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Wind Speed"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 240
+                        pos: 0, 10
+                
+            #Energy Report Widget
+            RelativeLayout:
+                size_hint: None, None
+                pos: 250, 0
+                FloatLayout:
+                    size_hint: None, None
+                    size: 300, 300
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c2)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                FloatLayout:
+                    size_hint: None, None
+                    size: 300, 25
+                    pos: 0, 275
+                    canvas.before:
+                        Color: 
+                            rgb: utils.get_color_from_hex(root.c3)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    size_hint: None, None
+                    halign: "center"
+                    valign: "bottom"
+                    text: "Energy Report"
+                    text_size: self.size
+                    font_name: "Avenir3"
+                    font_size: 13
+                    height: 25
+                    width: 300
+                    pos: 0, 280
+                #Total Widget
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 207
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "Total Gain:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 10
+                        height: 15
+                        width: 100
+                        pos: 15, 35
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 160, 3
+                        pos: 85, 41
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 32, 3
+                        pos: 85, 41
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c6)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "20%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 10
+                        height: 15
+                        width: 30
+                        pos: 260, 35
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "Total Used:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 10
+                        height: 15
+                        width: 100
+                        pos: 15, 12
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 160, 3
+                        pos: 85, 18
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 16, 3
+                        pos: 85, 18
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c5)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "10%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 10
+                        height: 15
+                        width: 60
+                        pos: 260, 12
+                #Sun Widget
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 139
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 290, 65
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Image:
+                        size_hint: None, None
+                        source: "images/SunIcon.png"
+                        size: 30, 30
+                        pos: 15, 25
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Solar"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 30
+                        pos: 15, 10
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 1, 45
+                        pos: 60, 10
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.sc)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Capacity:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 42
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 49
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 60, 2
+                        pos: 125, 49
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.sc)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "50%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 260, 42
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Gained:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 24
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 31
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 24, 2
+                        pos: 125, 31
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c6)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "20%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 30
+                        pos: 260, 24
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Used:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 6
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 13
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 12, 2
+                        pos: 125, 13
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c5)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "10%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 260, 6
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 71
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 290, 65
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Image:
+                        size_hint: None, None
+                        source: "images/WindIcon.png"
+                        size: 30, 30
+                        pos: 15, 25
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Wind"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 30
+                        pos: 15, 10
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 1, 45
+                        pos: 60, 10
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.wc)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Capacity:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 42
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 49
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 30, 2
+                        pos: 125, 49
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.wc)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "25%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 260, 42
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Gained:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 24
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 31
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 24, 2
+                        pos: 125, 31
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c6)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "20%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 30
+                        pos: 260, 24
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Used:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 6
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 13
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 12, 2
+                        pos: 125, 13
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c5)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "10%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 260, 6
+                RelativeLayout:
+                    size_hint: None, None
+                    pos: 5, 3
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 290, 65
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c1)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Image:
+                        size_hint: None, None
+                        source: "images/WaveIcon.png"
+                        size: 30, 30
+                        pos: 15, 25
+                    Label:
+                        size_hint: None, None
+                        halign: "center"
+                        valign: "bottom"
+                        text: "Hydro"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 30
+                        pos: 15, 15
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 1, 45
+                        pos: 60, 10
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.hc)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Capacity:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 42
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 49
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 24, 2
+                        pos: 125, 49
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.hc)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "20%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 260, 42
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Gained:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 24
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 31
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 24, 2
+                        pos: 125, 31
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c6)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "20%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 30
+                        pos: 260, 24
+                    Label:
+                        size_hint: None, None
+                        halign: "right"
+                        valign: "top"
+                        text: "Used:"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 55, 6
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 120, 2
+                        pos: 125, 13
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c3)
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    FloatLayout:
+                        size_hint: None, None
+                        size: 12, 2
+                        pos: 125, 13
+                        canvas.before:
+                            Color: 
+                                rgb: utils.get_color_from_hex(root.c5)
+                            Rectangle:
+                                pos: self.pos
+                                #change size on capacity
+                                size: self.size
+                    Label:
+                        size_hint: None, None
+                        halign: "left"
+                        valign: "top"
+                        text: "10%"
+                        text_size: self.size
+                        font_name: "GothamB"
+                        color: utils.get_color_from_hex(root.c4)
+                        font_size: 9
+                        height: 15
+                        width: 60
+                        pos: 260, 6
+            FloatLayout:
+                size_hint: None, None
+                size: 1, 300
+                pos: 250, 0
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c1)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            FloatLayout:
+                size_hint: None, None
+                size: 1, 25
+                pos: 250, 275
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c2)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+        RelativeLayout:
+            size: 800, 30
+            pos: 0, 620
+            dropdown: dropdown.__self__
+            size_hint_y: None
+            FloatLayout:
+                size_hint: None, None
+                size: 30, 30
+                pos: 0, 0    
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c7)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Image:
+                size_hint: None, None
+                source: "images/Logo.png"
+                size: 20, 20
+                allow_stretch: True
+                pos: 5, 5
+            FloatLayout:
+                size_hint: None, None
+                size: 500, 30
+                pos: 330, 0
+                canvas.before:
+                    Color: 
+                        rgb: utils.get_color_from_hex(root.c7)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            HoverButton:
+                id: file
+                text: "File"
+                size_hint_x: None
+                font_name: "Segoe"
+                font_size: 12
+                width: 100
+                pos:30, 0
+                background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+                background_down: 'images/LightGrey.jpg'
+                on_release: dropdown.open(self)
+                on_parent: dropdown.dismiss()
+            DropDown:
+                id: dropdown
+                on_select: file.text = '{}'.format(args[1])
+                auto_width: False
+                width: 150
+                HoverButton:
+                    font_name: "Segoe"
+                    font_size: 12
+                    text: 'New Plan'
+                    size_hint_y: None
+                    size_hint_x: None
+                    height: 30
+                    width: 150
+                    background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
+                    background_down: 'images/LightGrey.jpg'
+                    on_release: dropdown.select('First Item')
+                HoverButton:
+                    font_name: "Segoe"
+                    font_size: 12
+                    text: 'Open Plan'
+                    size_hint_y: None
+                    size_hint_x: None
+                    height: 30
+                    width: 150
+                    background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
+                    background_down: 'images/LightGrey.jpg'
+                    on_release: dropdown.select('First Item')
+                HoverButton:
+                    font_name: "Segoe"
+                    font_size: 12
+                    text: 'Save Plan'
+                    size_hint_y: None
+                    size_hint_x: None
+                    height: 30
+                    width: 150
+                    background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
+                    background_down: 'images/LightGrey.jpg'
+                    on_release: dropdown.select('First Item')
+            HoverButton:
+                size_hint_x: None
+                width: 100
+                text: "Edit"
+                font_name: "Segoe"
+                font_size: 12
+                pos:130, 0
+                background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+                background_down: 'images/LightGrey.jpg'
+            HoverButton:
+                text: "View"
+                font_name: "Segoe"
+                font_size: 12
+                size_hint_x: None
+                width: 100
+                pos:230, 0
+                background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+                background_down: 'images/LightGrey.jpg'
+            HoverButton:
+                text: "x"
+                font_name: "Gotham"
+                font_size: 16
+                size_hint_x: None
+                width: 50
+                pos: 750, 0 
+                background_normal: 'images/Red.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+                background_down: 'images/DarkRed.png'
+                on_release: app.stop()
+        FloatLayout:
+            size_hint: None, None
+            size: 1, 350
+            pos: 250, 250
+            canvas.before:
+                Color: 
+                    rgb: utils.get_color_from_hex(root.c1)
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        
+                
+                
+        
