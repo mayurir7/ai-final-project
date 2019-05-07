@@ -123,9 +123,6 @@ class FeatureExtractor():
         raw_data = []
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of tuples
-            for weather_tuple in forecast:
-                #convert wind from miles/hour to meters/second
-                weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
             raw_data.append(forecast)
             weather_reader.advanceTime()
 
