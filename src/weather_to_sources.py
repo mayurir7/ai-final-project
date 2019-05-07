@@ -33,8 +33,8 @@ class FeatureExtractor():
     Converts weather conditions to power
     """
     def __init__(self, path_to_data=None, path_to_energy=None):
-        self.raw_data = []  #holds the weather conditions
-        self.features = []  #holds (wind, solar, hydro) in MW
+        self.raw_data = []  #holds the weather conditions per hour
+        self.features = []  #holds (wind, solar, hydro) in MW per day
         self.energy_needed = [] #holds energy needed in MW per hour
         self.energy_gained = [] # holds energy gained per hour
         self.capacity = [0.0,0.0,0.0]
@@ -65,8 +65,8 @@ class FeatureExtractor():
                 wind_power += self.calculate_wind_power(weather_tuple.windSpeed)
                 solar_power += self.calculate_solar_power(weather_tuple.sunlight)
                 hydro_power += self.calculate_hydro_power()
-            weather_reader.advanceTime()
             self.features.append((wind_power, solar_power, hydro_power))
+            weather_reader.advanceTime()
 
     def calculate_wind_power(self, wind_speed):
         """
@@ -338,28 +338,14 @@ class Runner():
         renewables = 0
         for power in action:
             renewables = renewables + power
-
-        #for i in range(len(action)):
-        #    renewables += weights[i] * action[i]
-
         coal_used = self.features.getEnergyNeeded(state) - renewables
 
-        #if there is more energy_levels in any one source than energy_needed,
-        #reduce reward?
-        # for level in self.state.energy_levels:
-        #     if self.features.getEnergyNeeded(state) < level:
-        #         reduction = 50
-
-
-        #higher reward if using bigger feature
-        #reward if proportionally taking out of the energy_levels
         features = self.features.getFeatures(state)
+        #take the min for every feature, not just max of features
+        minimum = min(self.features.energy_needed, max(features)) #min bet needed and replenished
         max_feature_index = features.index(max(features))
-
-
-
-        
-        reward = (1 / coal_used) + (renewables)
+        diff = minimum - action[max_feature_index]
+        reward = (1 / coal_used) + (renewables) + (1/diff)
 
         if self.debug:
             print "REWARD", reward
