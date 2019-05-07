@@ -29,10 +29,13 @@ class State():
 
 
 class FeatureExtractor():
-    def __init__(self, path_to_data=None): #path is optional, if no path, do randomReader
+    """
+    Converts weather conditions to power
+    """
+    def __init__(self, path_to_data=None):
         self.raw_data = []  #holds the weather conditions
         self.features = []  #holds (wind, solar, hydro) in MW
-        self.energy_needed = [] #holds needed in MW per hour
+        self.energy_needed = [] #holds energy needed in MW per hour
         self.readData(path_to_data)
 
     def readData(self, path_to_data):
@@ -44,7 +47,7 @@ class FeatureExtractor():
             weather_reader = RandomReader(365)
 
         else:
-            weather_reader = DataReader(path_to_data) #TODO change DataReader init to take this?
+            weather_reader = DataReader(path_to_data)
 
         while weather_reader.canGetForecast():
                 forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
@@ -53,8 +56,6 @@ class FeatureExtractor():
                     weather_tuple.windSpeed = weather_tuple.windSpeed/2.237
                 self.raw_data.append(forecast)
                 weather_reader.advanceTime()
-
-
 
         #convert weather to power
         for day in self.raw_data:
@@ -67,7 +68,9 @@ class FeatureExtractor():
 
 
     def calculate_wind_power(self, wind_speed):
-        #returns wind power in mega watts
+        """
+        Returns wind power in mega watts
+        """
 
         air_density = 1 #could change but isn't that important
         area = 7853 #(max in texas onshore is 130 feet diameter, radius = 50ft, pi*r^2 == 7853)
@@ -75,14 +78,18 @@ class FeatureExtractor():
 
 
     def calculate_solar_power(self, sun_hours):
-        #returns solar power in mega watts
+        """
+        Returns solar power in mega watts
+        """
 
         fudge_factor = .75
         panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capactity in Travis county)
         return (panel_wattage*sun_hours*fudge_factor) / 1000000.0
 
     def calculate_hydro_power(self):
-        #returns hydro power in mega watts
+        """
+        Returns hydro power in mega watts
+        """
 
         efficiency = .8 #average hydroelectric plant efficiency
         water_density = 997
@@ -96,21 +103,21 @@ class FeatureExtractor():
         """
         Returns the features for a given day and hour
         """
-        index = ((state.day - 1) * 24) + (state.hour - 1)
+        index = ((state.day) * 24) + (state.hour)
         return self.features[index]
 
     def getEnergyNeeded(self, state):
         """
         Returns the energy needed for a given day and hour
         """
-        index = ((state.day - 1) * 24) + (state.hour - 1)
+        index = ((state.day) * 24) + (state.hour)
         return self.energy_needed[index]
 
     def getRawData(self, state):
         """
         Returns the raw data (weather conditions) for a given day and hour
         """
-        return self.raw_data[state.day - 1][state.hour - 1]
+        return self.raw_data[state.day][state.hour]
 
     def initializeState(self, state, weather_reader):
         """
@@ -138,7 +145,7 @@ class FeatureExtractor():
 
 class ApproximateQLearner():
     """
-    self.weights: list storing the weights, index matches up with features
+    Approximate Q Learning Agent
     """
 
     def __init__(self, alpha, discount):
@@ -255,19 +262,19 @@ class Runner():
         action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
         nextState = self.state
-        if nextState.hour > 24:
+        if nextState.hour >= 23:
             nextState.day += 1
-            nextState.hour = 1
+            nextState.hour = 0
         else:
             nextState.hour += 1
 
         for idx in range(len(nextState.energy_levels)):
             nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
         
-        self.state = nextState
 
         current_raw_data = self.features.getRawData(self.state)
         current_features = self.features.getFeatures(self.state)
+        self.state = nextState
         return current_raw_data, current_features, action, self.state.energy_levels
 
     def iterate(self):
@@ -280,9 +287,9 @@ class Runner():
         action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
         nextState = self.state
-        if nextState.hour > 24:
+        if nextState.hour >= 23:
             nextState.day += 1
-            nextState.hour = 1
+            nextState.hour = 0
         else:
             nextState.hour += 1
         

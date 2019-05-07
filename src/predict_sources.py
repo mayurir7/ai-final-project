@@ -8,19 +8,27 @@ import os
 
 
 class PredictSources():
-#read in csv (use datareader), predict for each line, store prediction for each line
+    """
+    Class that takes in a client's weather conditions and predicts the optimal
+    mix of renewable energy sources to utilize per hour
+    """
 
     def __init__(self, path_to_data=None):
         self.final_weights = self.getWeights()
-        self.runner = Runner(1000, 500, 0.5, 0.1, 0.5)
+        self.runner = Runner(1000, 500, 0.5, 0.1, 0.5, path_to_data)
+        self.startingEnergyLevel = self.runner.state.energy_levels
         self.result = []
 
+        #initialize raw_data with the client's weather conditions
         if path_to_data is not None:
             self.runner.features.readData(path_to_data)
         
         self.prediction()
 
     def getWeights(self):
+        """
+        Read in final weights learned from training
+        """
         input_dir = "../src"
         file = "final_weights.txt"
         input_file = os.path.join(input_dir, file)
@@ -35,7 +43,6 @@ class PredictSources():
         Returns how much of each energy source we can use this hour.
         """
 
-        #pass in energy_needed or else it'll just use ercot
         for weather_tuple in self.runner.features.raw_data:
             raw_data, features, action, energy_levels = self.runner.predict_iterate()
             self.result.append((raw_data, features, action, energy_levels))
@@ -43,4 +50,4 @@ class PredictSources():
 
 
 if __name__ == '__main__':
-    test = PredictSources()
+    test = PredictSources(path_to_data="../data/10monthsV2.txt")
