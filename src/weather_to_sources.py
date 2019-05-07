@@ -220,9 +220,8 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        #incr = max_energy_needed / 500
-        #increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
-        increments = range(0, 10) # TODO: fix
+        incr = max_energy_needed / 500
+        increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
@@ -341,7 +340,7 @@ class Runner():
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
-    test = Runner(1000, 500, 0.5, 0.1, 0.5)
+    test = Runner(1000, 70000, 0.5, 0.1, 0.5)
     print "STARTING WEIGHTS: " , test.learner.weights
     print "STARTING ENERGY LEVELS: ", test.state.energy_levels
     test.run()
