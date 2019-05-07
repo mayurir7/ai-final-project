@@ -5,7 +5,7 @@ import itertools
 import random
 import pickle
 import os
-
+import sys
 
 class PredictSources():
     """
@@ -30,6 +30,8 @@ class PredictSources():
         Read in final weights learned from training
         """
         input_dir = "../src"
+        if "ui" in os.getcwd():
+            input_dir = "../"
         file = "final_weights.txt"
         input_file = os.path.join(input_dir, file)
         with open(input_file) as f:
