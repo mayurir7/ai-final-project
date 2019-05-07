@@ -12,11 +12,11 @@ class State():
     """
     State for the Q-learning situation
     """
-    def __init__(self, day, hour):
+    def __init__(self, day, hour, featureExtractor):
         self.energy_levels = [0, 0, 0] #energy left, indexed by EnergySource enum
         self.day = day
         self.hour = hour
-        FeatureExtractor().initializeState(self, RandomReader(1 * 24))
+        featureExtractor.initializeState(self, RandomReader(24 * 24))
 
     def getWind(self):
         return self.energy_levels[EnergySource.WIND.value]
@@ -37,6 +37,7 @@ class FeatureExtractor():
         self.features = []  #holds (wind, solar, hydro) in MW
         self.energy_needed = [] #holds energy needed in MW per hour
         self.energy_gained = [] # holds energy gained per hour
+        self.capacity = [0.0,0.0,0.0]
         self.readData(path_to_data, path_to_energy)
 
     def readData(self, path_to_data, path_to_energy):
@@ -84,7 +85,7 @@ class FeatureExtractor():
         """
 
         fudge_factor = .75
-        panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capactity in Travis county)
+        panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capacity in Travis county)
         return (panel_wattage*sun_hours*fudge_factor) / 1000000.0
 
     def calculate_hydro_power(self):
@@ -137,13 +138,19 @@ class FeatureExtractor():
             weather_reader.advanceTime()
 
         # convert weather to power (mega watts)
-        for weather_tuple in raw_data:
-            wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
-            solar_power = self.calculate_solar_power(weather_tuple.sunlight)
+        for idx in range(len(raw_data)):
+            wind_power = self.calculate_wind_power(raw_data[idx].windSpeed)
+            solar_power = self.calculate_solar_power(raw_data[idx].sunlight)
             hydro_power = self.calculate_hydro_power()
-            state.energy_levels[EnergySource.WIND.value] += wind_power
-            state.energy_levels[EnergySource.SOLAR.value] += solar_power
-            state.energy_levels[EnergySource.HYDRO.value] += hydro_power
+            if idx == 0:
+                state.energy_levels[EnergySource.WIND.value] += wind_power
+                state.energy_levels[EnergySource.SOLAR.value] += solar_power
+                state.energy_levels[EnergySource.HYDRO.value] += hydro_power
+            
+            self.capacity[EnergySource.WIND.value] += wind_power
+            self.capacity[EnergySource.SOLAR.value] += solar_power
+            self.capacity[EnergySource.HYDRO.value] += hydro_power
+
 
     def getNumFeatures(self):
         return len(self.features[0])
@@ -218,8 +225,8 @@ class Runner():
         self.epsilon = epsilon
         self.learner = ApproximateQLearner(alpha, discount)
         self.features = FeatureExtractor(path_to_data, path_to_energy)
+        self.state = State(0, 0, self.features)
         self.iterations = iterations
-        self.state = State(0, 0)
         self.action_space = self.generateLegalActions(max_energy_needed)
         self.debug = debug
     
@@ -279,11 +286,14 @@ class Runner():
         else:
             nextState.hour += 1
 
+        energy_gained = self.features.getEnergyGained(self.state)
         for idx in range(len(nextState.energy_levels)):
             nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getEnergyGained(self.state)[idx]
+            if nextState.energy_levels[idx] > self.features.capacity[idx]:
+                energy_gained = self.features.capacity[idx] - state.energy_levels[idx]
+                nextState.energy_levels[idx] = self.features.capacity[idx]
         
         current_raw_data = self.features.getRawData(self.state)
-        energy_gained = self.features.getEnergyGained(self.state)
         energy_left = list(nextState.energy_levels)
         self.state = nextState
         return current_raw_data, energy_gained, action, energy_left
@@ -307,6 +317,8 @@ class Runner():
         
         for idx in range(len(nextState.energy_levels)):
             nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + energy_gained[idx]
+            if nextState.energy_levels[idx] > self.features.capacity[idx]:
+                nextState.energy_levels[idx] = self.features.capacity[idx]
         
         # learn from it
         reward = self.calculateReward(self.state, action, self.learner.weights)
@@ -334,9 +346,18 @@ class Runner():
 
         #if there is more energy_levels in any one source than energy_needed,
         #reduce reward?
-        for level in self.state.energy_levels:
-            if self.features.getEnergyNeeded(state) < level:
-                reduction = 50
+        # for level in self.state.energy_levels:
+        #     if self.features.getEnergyNeeded(state) < level:
+        #         reduction = 50
+
+
+        #higher reward if using bigger feature
+        #reward if proportionally taking out of the energy_levels
+        features = self.features.getFeatures(state)
+        max_feature_index = features.index(max(features))
+
+
+
         
         reward = (1 / coal_used) + (renewables)
 
