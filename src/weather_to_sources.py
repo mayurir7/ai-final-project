@@ -286,17 +286,17 @@ class Runner():
         else:
             nextState.hour += 1
 
-        energy_gained = self.features.getEnergyGained(self.state)
+        energy_gained = list(self.features.getEnergyGained(self.state))
         for idx in range(len(nextState.energy_levels)):
             nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getEnergyGained(self.state)[idx]
             if nextState.energy_levels[idx] > self.features.capacity[idx]:
-                energy_gained = self.features.capacity[idx] - state.energy_levels[idx]
+                energy_gained[idx] = self.features.capacity[idx] - self.state.energy_levels[idx]
                 nextState.energy_levels[idx] = self.features.capacity[idx]
         
         current_raw_data = self.features.getRawData(self.state)
         energy_left = list(nextState.energy_levels)
         self.state = nextState
-        return current_raw_data, energy_gained, action, energy_left
+        return current_raw_data, energy_gained, action, energy_left, energy_needed
 
     def iterate(self):
         # get energy needed and gained for that day/hour

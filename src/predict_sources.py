@@ -42,8 +42,8 @@ class PredictSources():
         """
 
         for index in range(len(self.runner.features.raw_data) - 1):
-            raw_data, energy_gained, action, energy_levels = self.runner.predict_iterate()
-            self.result.append((self.runner.features.raw_data[index], energy_gained, action, energy_levels))
+            raw_data, energy_gained, action, energy_levels, energy_needed = self.runner.predict_iterate()
+            self.result.append((self.runner.features.raw_data[index], energy_gained, action, energy_levels, energy_needed))
 
 
 

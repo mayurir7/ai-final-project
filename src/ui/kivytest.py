@@ -152,11 +152,18 @@ class MainScreen(Screen):
         self.dates_to_indices()
 
         # TODO: calculate these numbers
-        self.sum_total_energy_needed = 70000
-        self.sum_net_energy = [0.0, 10.0, 0.0]
-        self.sum_energy_used = [25.0, 150.0, 50.0, 69875.0]
-        self.sum_energy_saved = 225
+        self.sum_total_energy_needed = 0
+        self.sum_net_energy = self.predicter.result[len(self.predicter.result) - 1][3]
+        self.sum_energy_used = [0.0, 0.0, 0.0, 0.0]
+        self.sum_energy_saved = 0
         
+        for tuple in self.predicter.result:
+            for idx in range(len(self.sum_energy_used) - 1):
+                self.sum_energy_used[idx] += tuple[2][idx]
+            self.sum_energy_used[3] += tuple[4] - sum(tuple[2])
+            self.sum_total_energy_needed += tuple[4]
+            self.sum_energy_saved += sum(tuple[2])
+
         # initialize properties        
         first = self.predicter.result[0][0] 
         self.on_date_time_change(first.month, first.day, first.year, first.hour)
