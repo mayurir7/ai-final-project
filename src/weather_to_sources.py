@@ -383,6 +383,7 @@ if __name__ == '__main__':
     if debug:
         print "STARTING WEIGHTS: " , test.learner.weights
         print "STARTING ENERGY LEVELS: ", test.state.energy_levels
+        print "CAPACITY: ", test.features.capacity
     test.run()
 
 

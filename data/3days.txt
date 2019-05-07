@@ -1,0 +1,82 @@
+1,	1,	2018,	0:56,	49,	13,	Mostly Cloudy
+1,	1,	2018,	1:56,	50,	17,	Mostly Cloudy
+1,	1,	2018,	2:03,	50,	20,	Fair
+1,	1,	2018,	2:56,	50,	21,	Partly Cloudy / Windy
+1,	1,	2018,	3:56,	52,	18,	Fair
+1,	1,	2018,	4:56,	53,	23,	Fair / Windy
+1,	1,	2018,	5:56,	53,	23,	Fair / Windy
+1,	1,	2018,	6:56,	53,	22,	Fair / Windy
+1,	1,	2018,	7:56,	53,	23,	Partly Cloudy / Windy
+1,	1,	2018,	8:56,	51,	22,	Partly Cloudy / Windy
+1,	1,	2018,	9:56,	49,	14,	Partly Cloudy
+1,	1,	2018,	10:56,	49,	14,	Mostly Cloudy
+1,	1,	2018,	11:56,	49,	8,	Partly Cloudy
+1,	1,	2018,	12:36,	47,	10,	Light Rain
+1,	1,	2018,	12:56,	48,	7,	Mostly Cloudy
+1,	1,	2018,	13:56,	47,	7,	Mostly Cloudy
+1,	1,	2018,	14:56,	47,	9,	Mostly Cloudy
+1,	1,	2018,	15:56,	47,	7,	Mostly Cloudy
+1,	1,	2018,	16:56,	47,	14,	Light Rain
+1,	1,	2018,	17:56,	45,	5,	Cloudy
+1,	1,	2018,	18:56,	45,	7,	Mostly Cloudy
+1,	1,	2018,	19:56,	46,	7,	Mostly Cloudy
+1,	1,	2018,	20:56,	45,	8,	Mostly Cloudy
+1,	1,	2018,	21:56,	45,	0,	Cloudy
+1,	1,	2018,	22:56,	44,	6,	Mostly Cloudy
+1,	1,	2018,	23:56,	44,	7,	Mostly Cloudy
+1,	2,	2018,	0:56,	44,	5,	Mostly Cloudy
+1,	2,	2018,	1:56,	45,	3,	Mostly Cloudy
+1,	2,	2018,	2:56,	47,	7,	Mostly Cloudy
+1,	2,	2018,	3:56,	48,	9,	Mostly Cloudy
+1,	2,	2018,	4:56,	52,	8,	Mostly Cloudy
+1,	2,	2018,	5:56,	52,	15,	Cloudy
+1,	2,	2018,	6:56,	51,	15,	Cloudy
+1,	2,	2018,	7:56,	52,	12,	Mostly Cloudy
+1,	2,	2018,	8:56,	51,	10,	Mostly Cloudy
+1,	2,	2018,	9:56,	51,	8,	Mostly Cloudy
+1,	2,	2018,	10:56,	50,	7,	Mostly Cloudy
+1,	2,	2018,	11:56,	50,	13,	Mostly Cloudy
+1,	2,	2018,	12:56,	50,	9,	Mostly Cloudy
+1,	2,	2018,	13:56,	49,	8,	Light Rain
+1,	2,	2018,	14:56,	49,	0,	Light Rain
+1,	2,	2018,	15:56,	49,	3,	Light Rain
+1,	2,	2018,	16:07,	49,	5,	Light Rain
+1,	2,	2018,	16:56,	48,	5,	Rain
+1,	2,	2018,	17:56,	49,	6,	Cloudy
+1,	2,	2018,	18:56,	48,	5,	Cloudy
+1,	2,	2018,	19:56,	48,	5,	Cloudy
+1,	2,	2018,	20:56,	48,	0,	Light Rain
+1,	2,	2018,	21:56,	48,	16,	Light Rain
+1,	2,	2018,	22:40,	48,	10,	Light Rain
+1,	2,	2018,	22:56,	48,	13,	Light Rain
+1,	2,	2018,	23:24,	48,	10,	Light Rain
+1,	2,	2018,	23:56,	49,	8,	Cloudy
+1,	3,	2018,	0:56,	49,	8,	Cloudy
+1,	3,	2018,	1:56,	50,	12,	Cloudy
+1,	3,	2018,	2:30,	50,	12,	Cloudy
+1,	3,	2018,	2:56,	51,	9,	Cloudy
+1,	3,	2018,	3:56,	52,	13,	Cloudy
+1,	3,	2018,	4:56,	53,	20,	Light Rain
+1,	3,	2018,	5:56,	53,	16,	Light Rain
+1,	3,	2018,	6:56,	53,	14,	Light Rain
+1,	3,	2018,	7:56,	53,	14,	Light Rain
+1,	3,	2018,	8:56,	53,	17,	Rain
+1,	3,	2018,	9:21,	53,	17,	Light Rain
+1,	3,	2018,	9:56,	56,	24,	Light Rain / Windy
+1,	3,	2018,	10:56,	57,	30,	Light Rain / Windy
+1,	3,	2018,	11:56,	55,	20,	Light Rain
+1,	3,	2018,	12:56,	57,	28,	Light Rain / Windy
+1,	3,	2018,	13:24,	57,	29,	Light Rain / Windy
+1,	3,	2018,	13:56,	58,	38,	Light Rain / Windy
+1,	3,	2018,	14:56,	58,	29,	Light Rain / Windy
+1,	3,	2018,	15:56,	58,	28,	Cloudy / Windy
+1,	3,	2018,	16:56,	58,	23,	Light Rain / Windy
+1,	3,	2018,	17:56,	58,	28,	Light Rain / Windy
+1,	3,	2018,	18:56,	58,	16,	Light Rain
+1,	3,	2018,	19:56,	58,	17,	Cloudy
+1,	3,	2018,	20:56,	58,	12,	Light Rain
+1,	3,	2018,	21:13,	58,	12,	Light Rain
+1,	3,	2018,	21:56,	57,	9,	Light Rain
+1,	3,	2018,	22:42,	56,	10,	Cloudy
+1,	3,	2018,	22:56,	56,	12,	Cloudy
+1,	3,	2018,	23:56,	54,	5,	Light Rain
