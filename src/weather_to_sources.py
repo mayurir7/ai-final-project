@@ -220,9 +220,9 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        incr = max_energy_needed / 500
-        #increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
-        increments = range(0, 10)
+        incr = max_energy_needed / 100
+        increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, max_energy_needed, incr) if max_energy_needed > 1000 else list())
+        #increments = range(0, 10)
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
@@ -302,10 +302,10 @@ class Runner():
         reward = self.calculateReward(self.state, action, self.learner.weights)
         self.learner.update(self.state, action, nextState, reward)
         self.state = nextState
-        # print "ACTION: " , action
-        # print "WEIGHTS: ", self.learner.weights
-        # print "FEATURES: ", self.features.getFeatures(self.state)
-        # print "ENERGY_NEEDED", energy_needed
+        print "ACTION: " , action
+        print "WEIGHTS: ", self.learner.weights
+        print "FEATURES: ", self.features.getFeatures(self.state)
+        print "ENERGY_NEEDED", energy_needed
 
     def calculateReward(self, state, action, weights):
         """
@@ -334,8 +334,10 @@ class Runner():
 
     def run(self):
         for idx in range(self.iterations):
+            if idx > self.iterations / 2:
+                self.epsilon = self.epsilon * 0.1
             self.iterate()
-            # print "ENERGY LEVELS: ", self.state.energy_levels #logging
+            print "ENERGY LEVELS: ", self.state.energy_levels #logging
 
 
 
