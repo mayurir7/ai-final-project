@@ -119,7 +119,7 @@ BoxLayout:
                     text_size: self.size
                     font_name: "GothamM"
                     color: utils.get_color_from_hex(root.c4)
-                    font_size: 10
+                    timtime_e_font_size: 10
                     height: 25
                     width: 200
                     pos: 5, 7
@@ -460,7 +460,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "left"
                     valign: "bottom"
-                    text: root.hour
+                    text: root.time
                     text_size: self.size
                     font_name: "GothamM"
                     font_size: 32
@@ -481,7 +481,7 @@ BoxLayout:
                     size_hint: None, None
                     halign: "left"
                     valign: "bottom"
-                    text: root.date
+                    text: root.date_str
                     text_size: self.size
                     font_name: "GothamBook"
                     font_size: 18
@@ -495,6 +495,7 @@ BoxLayout:
                     pos: 510, 30
                     background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
                     background_down: 'images/ClockDefault.png'
+                    on_release: root.on_date_time_change()
                 HoverButton:
                     id: calendar
                     size_hint: None, None
@@ -502,6 +503,7 @@ BoxLayout:
                     pos: 475, 30
                     background_normal: 'images/CalendarHover.png' if self.hovered else 'images/CalendarDefault.png'
                     background_down: 'images/CalendarDefault.png'
+                    on_release: root.on_date_time_change()
             #Conditions Widget
             RelativeLayout:
                 size_hint: None, None

@@ -11,7 +11,7 @@ from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.uix.dropdown import DropDown
 from kivy.input.providers import mouse
-from kivy.properties import BoundedNumericProperty, StringProperty, ReferenceListProperty, ListProperty,BooleanProperty, ObjectProperty
+from kivy.properties import BoundedNumericProperty, NumericProperty, StringProperty, ReferenceListProperty, ListProperty,BooleanProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.elevationbehavior import RectangularElevationBehavior
 from theming import ThemableBehavior, ThemeManager
@@ -24,6 +24,13 @@ from matplotlib.dates import (DateFormatter, AutoDateLocator, drange)
 import numpy as np
 import datetime
 from matplotlib import rcParams
+
+# do some black magic to import from parent folder
+import os, sys, inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)
+from predict_sources import PredictSources
 
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
@@ -116,14 +123,27 @@ class MainScreen(Screen):
     sc = StringProperty("#ffc600")
     hc = StringProperty("#21a5f0")
 
+    date_str = StringProperty()
+    time = StringProperty()
+    cloud_cover = StringProperty()
+    wind_speed = NumericProperty()
+    energy_gain = ListProperty()
+    energy_loss = ListProperty()
+    energy_levels = ListProperty()
+    sum_total_energy_needed = NumericProperty()
+    sum_net_energy = ListProperty()
+    sum_energy_used = ListProperty()
+    sum_energy_saved = NumericProperty()
+
     def __init__(self, **kwargs):
         self.dropdown = CustomDropDown()
         self.dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         super(MainScreen, self).__init__(**kwargs)
+        # get prediction class
+        self.predicter = PredictSources()
         # all arrays indexed in same order as enum [wind, solar, hydro, coal]
         # properties that change given the date/time
-        self.date = "January 1, 2018"
-        self.hour = "11:00"
+        self.update_date_time(2019, 1, 9, 12, 4)
         self.temp = 65
         self.cloud_cover = "T-Storm"
         self.wind_speed = 10 * 2.237
@@ -132,14 +152,17 @@ class MainScreen(Screen):
         self.energy_levels = [0.6, 50.5, 1.3]
         # properties that should not change once prediction is done
         self.sum_total_energy_needed = 70000
-        self.sum_net_energy = [0, 10, 0]
-        self.sum_energy_used = [25, 150, 50, 69875]
+        self.sum_net_energy = [0.0, 10.0, 0.0]
+        self.sum_energy_used = [25.0, 150.0, 50.0, 69875.0]
         self.sum_energy_saved = 225
+        # capacity numbers
+        self.capacity = [2000.0, 50000.0, 1000.0]
 
     def on_pre_enter(self, *args):
+        # handle graph stuff
+
         plt.style.use('dark_background')
         
-
         loc = AutoDateLocator()
         formatter = DateFormatter('%m-%d-%y')
         date1 = datetime.date(2018, 1, 1)
@@ -162,12 +185,36 @@ class MainScreen(Screen):
         plt.grid(color='#686868', linestyle=':', linewidth=.5)
         self.ids.test.add_widget(FigureCanvasKivyAgg(plt.gcf()))
 
+        # get the initial numbers for everything
+        # all arrays indexed in same order as enum [wind, solar, hydro, coal]
+        # properties that change given the date/time
+        self.temp = 65
+        self.cloud_cover = "T-Storm"
+        self.wind_speed = 10 * 2.237
+        self.energy_gain = [0.5, 100.0, 0.786]
+        self.energy_loss = [0.0, 50.0, 0.0]
+        self.energy_levels = [0.6, 50.5, 1.3]
+        # properties that should not change once prediction is done
+        self.sum_total_energy_needed = 70000
+        self.sum_net_energy = [0.0, 10.0, 0.0]
+        self.sum_energy_used = [25.0, 150.0, 50.0, 69875.0]
+        self.sum_energy_saved = 225
+        # capacity numbers
+        self.capacity = [2000.0, 50000.0, 1000.0]
+
+    def update_date_time(self, month, day, year, hour, minute):
+        self.date = datetime.datetime(month, day, year, hour, minute)
+        self.date_str = self.date.strftime("%B %d, %Y")
+        self.time = self.date.strftime("%H:%M") 
+
     def on_leave(self, *args):
         self.ids.test.remove_widget(self.ids.test.children[0])
 
     def click_file(self):
         self.dropdown.open(self)
 
+    def on_date_time_change(self):
+        self.update_date_time(2019, 1, 10, 15, 55)
 
 class CustomDropDown(DropDown):
     pass
