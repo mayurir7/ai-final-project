@@ -145,6 +145,8 @@ class FeatureExtractor():
             state.energy_levels[EnergySource.SOLAR.value] += solar_power
             state.energy_levels[EnergySource.HYDRO.value] += hydro_power
 
+    def getNumFeatures(self):
+        return len(self.features[0])
 
 class ApproximateQLearner():
     """
@@ -152,8 +154,8 @@ class ApproximateQLearner():
     """
 
     def __init__(self, alpha, discount):
-        self.weights = [random.random() for _ in range(len(WeatherConditions))]
         self.featExtractor = FeatureExtractor()
+        self.weights = [random.random() for _ in range(self.featExtractor.getNumFeatures())]
         self.discount = discount
         self.alpha = alpha
         self.legalActions = []
@@ -173,9 +175,11 @@ class ApproximateQLearner():
         featureVector = self.featExtractor.getFeatures(state)
         weight = self.getWeights()
         result = 0.0
-        for idx in range(len(featureVector)):
+        for idx in range(len(action)):
             result += (featureVector[idx] - action[idx]) * weight[idx]
-        
+        for idx in range(len(action), len(featureVector)):
+            result += featureVector[idx] * weight[idx]
+
         renewables = 0
         for a in action:
             renewables += a
@@ -323,9 +327,8 @@ class Runner():
         for power in action:
             renewables = renewables + power
 
-
-        for i in range(len(weights)):
-            renewables += weights[i] * action[i]
+        #for i in range(len(action)):
+        #    renewables += weights[i] * action[i]
 
         coal_used = self.features.getEnergyNeeded(state) - renewables
 
@@ -334,10 +337,13 @@ class Runner():
         for level in self.state.energy_levels:
             if self.features.getEnergyNeeded(state) < level:
                 reduction = 50
+        
+        reward = (1 / coal_used) + (renewables)
 
         if self.debug:
-            print "REWARD", (1 / coal_used) + (10*renewables)
-        return (1 / coal_used) + (10*renewables)
+            print "REWARD", reward
+
+        return reward
 
 
     def run(self):
@@ -351,8 +357,8 @@ class Runner():
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
-    debug = False
-    test = Runner(10, 70000, 0.5, 0.1, 0.5, debug=debug)
+    debug = True
+    test = Runner(1000, 70000, 0.5, 0.1, 0.5, debug=debug)
     if debug:
         print "STARTING WEIGHTS: " , test.learner.weights
         print "STARTING ENERGY LEVELS: ", test.state.energy_levels
