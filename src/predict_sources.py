@@ -41,9 +41,9 @@ class PredictSources():
         Returns how much of each energy source we can use this hour.
         """
 
-        for weather_tuple in self.runner.features.raw_data:
-            raw_data, features, action, energy_levels = self.runner.predict_iterate()
-            self.result.append((raw_data, features, action, energy_levels))
+        for index in range(len(self.runner.features.raw_data) - 1):
+            raw_data, energy_gained, action, energy_levels = self.runner.predict_iterate()
+            self.result.append((self.runner.features.raw_data[index], energy_gained, action, energy_levels))
 
 
 
