@@ -13,16 +13,12 @@ class PredictSources():
     mix of renewable energy sources to utilize per hour
     """
 
-    def __init__(self, path_to_data=None):
+    def __init__(self, path_to_data=None, path_to_energy=None):
         self.final_weights = self.getWeights()
-        self.runner = Runner(1000, 500, 0.5, 0.1, 0.5, path_to_data)
+        self.runner = Runner(0, 500, 0.5, 0.1, 0.5, path_to_data, path_to_energy)
         self.startingEnergyLevel = self.runner.state.energy_levels
         self.result = []
 
-        #initialize raw_data with the client's weather conditions
-        if path_to_data is not None:
-            self.runner.features.readData(path_to_data)
-        
         self.prediction()
 
     def getWeights(self):
@@ -52,4 +48,4 @@ class PredictSources():
 
 
 if __name__ == '__main__':
-    test = PredictSources(path_to_data="../data/10monthsV2.txt")
+    test = PredictSources(path_to_data = "../data/10monthsV2.txt")

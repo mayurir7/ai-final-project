@@ -25,9 +25,9 @@ class WeatherData:
         self.hour = _hour
         self.minute = _minute
     def __repr__(self):
-        return (self.windSpeed, self.sunlight, self.ERCOT, self.month, self.day, self.year, self.hour, self.minute).__str__()
+        return (self.windSpeed, self.sunlight, self.ERCOT, self.sunForecast, self.temperature, self.month, self.day, self.year, self.hour, self.minute).__str__()
     def __str__(self):
-        return (self.windSpeed, self.sunlight, self.ERCOT, self.month, self.day, self.year, self.hour, self.minute).__str__()
+        return (self.windSpeed, self.sunlight, self.ERCOT, self.sunForecast, self.temperature, self.month, self.day, self.year, self.hour, self.minute).__str__()
 
 #Below are the public functions for a Reader
 class Reader:
@@ -76,11 +76,11 @@ class DataReader(Reader):
         return self.data[self.time : (self.time + FORECAST_LIMIT)]
     def advanceTime(self):
         self.time = self.time + 1
-    def __init__(self, path_to_data="../data/10monthsV2.txt"):
+    def __init__(self, path_to_data="../data/10monthsV2.txt", path_to_energy="../data/2018load.csv"):
         self.time = 0
         self.data = []
         emap = dict()
-        f = open("../data/2018load.csv")
+        f = open(path_to_energy)
         skip = True
         for row in f:
             if skip:

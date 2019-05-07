@@ -32,13 +32,13 @@ class FeatureExtractor():
     """
     Converts weather conditions to power
     """
-    def __init__(self, path_to_data=None):
+    def __init__(self, path_to_data=None, path_to_energy=None):
         self.raw_data = []  #holds the weather conditions
         self.features = []  #holds (wind, solar, hydro) in MW
         self.energy_needed = [] #holds energy needed in MW per hour
-        self.readData(path_to_data)
+        self.readData(path_to_data, path_to_energy)
 
-    def readData(self, path_to_data):
+    def readData(self, path_to_data, path_to_energy):
         """
         Reads in weather data from a file and stores it
         """
@@ -47,7 +47,7 @@ class FeatureExtractor():
             weather_reader = RandomReader(365)
 
         else:
-            weather_reader = DataReader(path_to_data)
+            weather_reader = DataReader(path_to_data, path_to_energy)
 
         while weather_reader.canGetForecast():
                 forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
@@ -207,10 +207,10 @@ class ApproximateQLearner():
         self.weights = [float(i) / sum(self.weights) for i in self.weights]
 
 class Runner():
-    def __init__(self, iterations, max_energy_needed, epsilon, alpha, discount, path_to_data=None):
+    def __init__(self, iterations, max_energy_needed, epsilon, alpha, discount, path_to_data=None, path_to_energy=None):
         self.epsilon = epsilon
         self.learner = ApproximateQLearner(alpha, discount)
-        self.features = FeatureExtractor(path_to_data)
+        self.features = FeatureExtractor(path_to_data, path_to_energy)
         self.iterations = iterations
         self.state = State(0, 0)
         self.action_space = self.generateLegalActions(max_energy_needed)
@@ -219,8 +219,9 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        incr = max_energy_needed / 500 if max_energy_needed > 500 else 50
-        increments = range(0,100) + range(100, 1000, 50) + range(1000, 5000, incr)
+        #incr = max_energy_needed / 500
+        #increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
+        increments = range(0, 10) # TODO: fix
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
