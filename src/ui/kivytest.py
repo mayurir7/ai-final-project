@@ -126,10 +126,13 @@ class MainScreen(Screen):
     date_str = StringProperty()
     time = StringProperty()
     cloud_cover = StringProperty()
+    temp = NumericProperty()
     wind_speed = NumericProperty()
     energy_gain = ListProperty()
     energy_loss = ListProperty()
     energy_levels = ListProperty()
+    total_gain = NumericProperty()
+    total_loss = NumericProperty()
     sum_total_energy_needed = NumericProperty()
     sum_net_energy = ListProperty()
     sum_energy_used = ListProperty()
@@ -139,24 +142,24 @@ class MainScreen(Screen):
         self.dropdown = CustomDropDown()
         self.dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         super(MainScreen, self).__init__(**kwargs)
+        
         # get prediction class
-        self.predicter = PredictSources()
-        # all arrays indexed in same order as enum [wind, solar, hydro, coal]
-        # properties that change given the date/time
-        self.update_date_time(2019, 1, 9, 12, 4)
-        self.temp = 65
-        self.cloud_cover = "T-Storm"
-        self.wind_speed = 10 * 2.237
-        self.energy_gain = [0.5, 100.0, 0.786]
-        self.energy_loss = [0.0, 50.0, 0.0]
-        self.energy_levels = [0.6, 50.5, 1.3]
-        # properties that should not change once prediction is done
+        self.predicter = PredictSources(path_to_data="../../data/10monthsV2.txt", path_to_energy="../../data/2018load.csv")
+        
+        # properties that do not change
+        self.capacity = self.predicter.startingEnergyLevel
+        print self.capacity
+        self.dates_to_indices()
+
+        # TODO: calculate these numbers
         self.sum_total_energy_needed = 70000
         self.sum_net_energy = [0.0, 10.0, 0.0]
         self.sum_energy_used = [25.0, 150.0, 50.0, 69875.0]
         self.sum_energy_saved = 225
-        # capacity numbers
-        self.capacity = [2000.0, 50000.0, 1000.0]
+        
+        # initialize properties        
+        first = self.predicter.result[0][0] 
+        self.on_date_time_change(first.month, first.day, first.year, first.hour)
 
     def on_pre_enter(self, *args):
         # handle graph stuff
@@ -185,36 +188,43 @@ class MainScreen(Screen):
         plt.grid(color='#686868', linestyle=':', linewidth=.5)
         self.ids.test.add_widget(FigureCanvasKivyAgg(plt.gcf()))
 
-        # get the initial numbers for everything
-        # all arrays indexed in same order as enum [wind, solar, hydro, coal]
-        # properties that change given the date/time
-        self.temp = 65
-        self.cloud_cover = "T-Storm"
-        self.wind_speed = 10 * 2.237
-        self.energy_gain = [0.5, 100.0, 0.786]
-        self.energy_loss = [0.0, 50.0, 0.0]
-        self.energy_levels = [0.6, 50.5, 1.3]
-        # properties that should not change once prediction is done
-        self.sum_total_energy_needed = 70000
-        self.sum_net_energy = [0.0, 10.0, 0.0]
-        self.sum_energy_used = [25.0, 150.0, 50.0, 69875.0]
-        self.sum_energy_saved = 225
-        # capacity numbers
-        self.capacity = [2000.0, 50000.0, 1000.0]
+    def dates_to_indices(self):
+        mapping = {}
+        for index in range(len(self.predicter.result)):
+            raw_data = self.predicter.result[index][0]
+            mapping[tuple((raw_data.month, raw_data.day, raw_data.year, raw_data.hour))] = index
+        self.indices = mapping
 
     def update_date_time(self, month, day, year, hour, minute):
-        self.date = datetime.datetime(month, day, year, hour, minute)
+        self.date = datetime.datetime(year, month, day, hour, minute)
         self.date_str = self.date.strftime("%B %d, %Y")
-        self.time = self.date.strftime("%H:%M") 
+        self.time = self.date.strftime("%H:%M")
+
+    def percentage(self, array):
+        array = list(array)
+        for index in range(len(self.capacity)):
+            array[index] = array[index] / self.capacity[index] * 100.0
+        return array
+
+    def on_date_time_change(self, month, day, year, hour):
+        # updates the text labels based on the prediction for that date/time
+        entry = self.predicter.result[self.indices[(month, day, year, hour)]]
+        self.update_date_time(month, day, year, hour, entry[0].minute)
+        self.temp = entry[0].temperature
+        self.cloud_cover = entry[0].sunForecast
+        self.wind_speed = entry[0].windSpeed * 2.237
+        self.temperature = entry[0].temperature
+        self.energy_gain = self.percentage(entry[1])
+        self.energy_loss = self.percentage(entry[2])
+        self.energy_levels = self.percentage(entry[3])
+        self.total_gain = sum(entry[1]) / sum(self.capacity) * 100.0
+        self.total_loss = sum(entry[2]) / sum(self.capacity) * 100.0
 
     def on_leave(self, *args):
         self.ids.test.remove_widget(self.ids.test.children[0])
 
     def click_file(self):
         self.dropdown.open(self)
-
-    def on_date_time_change(self):
-        self.update_date_time(2019, 1, 10, 15, 55)
 
 class CustomDropDown(DropDown):
     pass

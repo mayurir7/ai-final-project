@@ -495,7 +495,7 @@ BoxLayout:
                     pos: 510, 30
                     background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
                     background_down: 'images/ClockDefault.png'
-                    on_release: root.on_date_time_change()
+                    on_release: root.on_date_time_change(3, 23, 2018, 4)
                 HoverButton:
                     id: calendar
                     size_hint: None, None
@@ -503,7 +503,7 @@ BoxLayout:
                     pos: 475, 30
                     background_normal: 'images/CalendarHover.png' if self.hovered else 'images/CalendarDefault.png'
                     background_down: 'images/CalendarDefault.png'
-                    on_release: root.on_date_time_change()
+                    on_release: root.on_date_time_change(6, 18, 2018, 7)
             #Conditions Widget
             RelativeLayout:
                 size_hint: None, None
@@ -753,7 +753,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(sum(root.energy_gain)) + " Mwh"
+                        text: str(root.total_gain) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -798,7 +798,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(sum(root.energy_loss)) + " Mwh"
+                        text: str(root.total_loss) + " %"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -883,7 +883,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_levels[1]) + " Mwh"
+                        text: str(root.energy_levels[1]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -928,7 +928,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_gain[1]) + " Mwh"
+                        text: str(root.energy_gain[1]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -973,7 +973,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_loss[1]) + " Mwh"
+                        text: str(root.energy_loss[1]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1057,7 +1057,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_levels[0]) + " Mwh"
+                        text: str(root.energy_levels[0]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1102,7 +1102,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_gain[0]) + " Mwh"
+                        text: str(root.energy_gain[0]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1147,7 +1147,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_loss[0]) + " Mwh"
+                        text: str(root.energy_loss[0]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1231,7 +1231,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_levels[2]) + " Mwh"
+                        text: str(root.energy_levels[2]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1276,7 +1276,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_gain[2]) + " Mwh"
+                        text: str(root.energy_gain[2]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
@@ -1321,7 +1321,7 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.energy_loss[2]) + " Mwh"
+                        text: str(root.energy_loss[2]) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)

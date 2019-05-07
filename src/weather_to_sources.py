@@ -16,7 +16,7 @@ class State():
         self.energy_levels = [0, 0, 0] #energy left, indexed by EnergySource enum
         self.day = day
         self.hour = hour
-        FeatureExtractor().initializeState(self, RandomReader(50))
+        FeatureExtractor().initializeState(self, RandomReader(50 * 24))
 
     def getWind(self):
         return self.energy_levels[EnergySource.WIND.value]
@@ -221,7 +221,8 @@ class Runner():
         Returns an array of actions for the largest energy needed
         """
         incr = max_energy_needed / 500
-        increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
+        #increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
+        increments = range(0, 10)
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
@@ -270,13 +271,13 @@ class Runner():
             nextState.hour += 1
 
         for idx in range(len(nextState.energy_levels)):
-            nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
+            nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getEnergyGained(self.state)[idx]
         
-
         current_raw_data = self.features.getRawData(self.state)
-        current_features = self.features.getFeatures(self.state)
+        energy_gained = self.features.getEnergyGained(self.state)
+        energy_left = list(nextState.energy_levels)
         self.state = nextState
-        return current_raw_data, current_features, action, self.state.energy_levels
+        return current_raw_data, energy_gained, action, energy_left
 
     def iterate(self):
         # get energy needed for that day/hour
