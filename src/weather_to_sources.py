@@ -368,13 +368,17 @@ class Runner():
 
 
     def run(self):
+        incr = 0.95
         for idx in range(self.iterations):
-            if idx > self.iterations / 2:
-                self.epsilon = self.epsilon * 0.1
+            if self.debug:
+                print "-----------------\nITERATION #" , idx
             self.iterate()
+            if idx % 10 == 0:
+                self.epsilon = self.epsilon * incr
+                incr = incr * 0.99
             if self.debug:
                 print "ENERGY LEVELS: ", self.state.energy_levels #logging
-
+                print "epsilon: " , self.epsilon
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
