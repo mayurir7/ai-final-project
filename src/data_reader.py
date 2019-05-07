@@ -14,7 +14,7 @@ class WeatherData:
     hour = 0
     minute = 0
     def __init__(self, _windSpeed, _sunlight, _ERCOT, _sun, _temp, _month, _day, _year, _hour, _minute):
-        self.windSpeed = _windSpeed
+        self.windSpeed = _windSpeed / 2.237 #convert from mph to meters per second
         self.sunlight = _sunlight
         self.ERCOT = _ERCOT
         self.sunForecast = _sun
