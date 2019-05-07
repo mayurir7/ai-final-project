@@ -100,7 +100,6 @@ class DataReader(Reader):
         #day = 1
         #year = 2018
         lasthour = 0
-        skip = True
         conds = set()
         for row in f:
             month, day, year, time, temp, windspeed, cond = row.split(",")
@@ -111,11 +110,6 @@ class DataReader(Reader):
             hour, minute = time.split(":")
             hour = int(hour)
             minute = int(minute)
-            if skip:
-                if hour == 0:
-                    skip = False
-                else:
-                    continue
             temp = int(temp.strip())
             windspeed = int(windspeed.strip())
             cond = cond.strip()
@@ -210,8 +204,8 @@ class DataReader(Reader):
 #    rr.advanceTime()
 
 #Sample Code on a DataReader
-# dr = DataReader()
-# while dr.canGetForecast():
-#     forecast = dr.getForecast()
-#     print(forecast)
-#     dr.advanceTime()
+#dr = DataReader()
+#while dr.canGetForecast():
+#    forecast = dr.getForecast()
+#    print(forecast)
+#    dr.advanceTime()
