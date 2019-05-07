@@ -45,14 +45,13 @@ class FeatureExtractor():
         """
 
         if path_to_data == None:
-            weather_reader = RandomReader(365)
+            weather_reader = RandomReader(365 * 24)
         else:
             weather_reader = DataReader(path_to_data, path_to_energy)
 
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
             # store raw numbers
-            print forecast[0].day
             self.raw_data.append(forecast[0])
             self.energy_needed.append(forecast[0].ERCOT)
             self.energy_gained.append((self.calculate_wind_power(forecast[0].windSpeed), self.calculate_solar_power(forecast[0].sunlight), self.calculate_hydro_power()))
@@ -105,7 +104,6 @@ class FeatureExtractor():
         Returns the features for a given day and hour
         """
         index = ((state.day) * 24) + (state.hour)
-        print state.day, state.hour, index
         return self.features[index]
 
     def getEnergyNeeded(self, state):
