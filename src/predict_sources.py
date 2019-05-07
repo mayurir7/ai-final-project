@@ -15,7 +15,7 @@ class PredictSources():
 
     def __init__(self, path_to_data=None, path_to_energy=None):
         self.final_weights = self.getWeights()
-        self.runner = Runner(0, 500, 0.5, 0.1, 0.5, path_to_data, path_to_energy)
+        self.runner = Runner(0, 500, 0, 0.1, 0.5, path_to_data, path_to_energy)
         self.startingEnergyLevel = list(self.runner.state.energy_levels) #capacity
         self.result = []
 
