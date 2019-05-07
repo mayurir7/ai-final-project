@@ -36,6 +36,7 @@ class FeatureExtractor():
         self.raw_data = []  #holds the weather conditions
         self.features = []  #holds (wind, solar, hydro) in MW
         self.energy_needed = [] #holds energy needed in MW per hour
+        self.energy_gained = [] # holds energy gained per hour
         self.readData(path_to_data, path_to_energy)
 
     def readData(self, path_to_data, path_to_energy):
@@ -45,24 +46,27 @@ class FeatureExtractor():
 
         if path_to_data == None:
             weather_reader = RandomReader(365)
-
         else:
             weather_reader = DataReader(path_to_data, path_to_energy)
 
         while weather_reader.canGetForecast():
-                forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
-                self.raw_data.append(forecast)
-                weather_reader.advanceTime()
-
-        #convert weather to power
-        for day in self.raw_data:
-            for weather_tuple in day:
-                wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
-                solar_power = self.calculate_solar_power(weather_tuple.sunlight)
-                hydro_power = self.calculate_hydro_power()
-                self.features.append((wind_power, solar_power, hydro_power))
-                self.energy_needed.append(weather_tuple.ERCOT)
-
+            forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
+            # store raw numbers
+            print forecast[0].day
+            self.raw_data.append(forecast[0])
+            self.energy_needed.append(forecast[0].ERCOT)
+            self.energy_gained.append((self.calculate_wind_power(forecast[0].windSpeed), self.calculate_solar_power(forecast[0].sunlight), self.calculate_hydro_power()))
+            # calculate features
+            wind_power = 0.0
+            solar_power = 0.0
+            hydro_power = 0.0
+            for weather_tuple in forecast:
+                #convert weather to power
+                wind_power += self.calculate_wind_power(weather_tuple.windSpeed)
+                solar_power += self.calculate_solar_power(weather_tuple.sunlight)
+                hydro_power += self.calculate_hydro_power()
+            weather_reader.advanceTime()
+            self.features.append((wind_power, solar_power, hydro_power))
 
     def calculate_wind_power(self, wind_speed):
         """
@@ -101,6 +105,7 @@ class FeatureExtractor():
         Returns the features for a given day and hour
         """
         index = ((state.day) * 24) + (state.hour)
+        print state.day, state.hour, index
         return self.features[index]
 
     def getEnergyNeeded(self, state):
@@ -114,8 +119,13 @@ class FeatureExtractor():
         """
         Returns the raw data (weather conditions) for a given day and hour
         """
-        return self.raw_data[state.day][state.hour]
+        index = ((state.day * 24) + state.hour)
+        return self.raw_data[index]
 
+    def getEnergyGained(self, state):
+        index = ((state.day) * 24) + (state.hour)
+        return self.energy_gained[index]
+    
     def initializeState(self, state, weather_reader):
         """
         Given a reader, read in data for first 50 days and use to initialize
@@ -123,18 +133,17 @@ class FeatureExtractor():
         raw_data = []
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of tuples
-            raw_data.append(forecast)
+            raw_data.append(forecast[0])
             weather_reader.advanceTime()
 
         # convert weather to power (mega watts)
-        for day in raw_data:
-            for weather_tuple in day:
-                wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
-                solar_power = self.calculate_solar_power(weather_tuple.sunlight)
-                hydro_power = self.calculate_hydro_power()
-                state.energy_levels[EnergySource.WIND.value] += wind_power
-                state.energy_levels[EnergySource.SOLAR.value] += solar_power
-                state.energy_levels[EnergySource.HYDRO.value] += hydro_power
+        for weather_tuple in raw_data:
+            wind_power = self.calculate_wind_power(weather_tuple.windSpeed)
+            solar_power = self.calculate_solar_power(weather_tuple.sunlight)
+            hydro_power = self.calculate_hydro_power()
+            state.energy_levels[EnergySource.WIND.value] += wind_power
+            state.energy_levels[EnergySource.SOLAR.value] += solar_power
+            state.energy_levels[EnergySource.HYDRO.value] += hydro_power
 
 
 class ApproximateQLearner():
@@ -213,9 +222,9 @@ class Runner():
         """
         Returns an array of actions for the largest energy needed
         """
-        incr = max_energy_needed / 500
-        increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
-        #increments = range(0, 10) # TODO: fix
+        #incr = max_energy_needed / 500
+        #increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, 5000, incr) if max_energy_needed > 1000 else list())
+        increments = range(0, 10) # TODO: fix
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
@@ -289,7 +298,7 @@ class Runner():
             nextState.hour += 1
         
         for idx in range(len(nextState.energy_levels)):
-            nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getFeatures(self.state)[idx]
+            nextState.energy_levels[idx] = nextState.energy_levels[idx] - list(action)[idx] + self.features.getEnergyGained(self.state)[idx]
         
         # learn from it
         reward = self.calculateReward(self.state, action, self.learner.weights)
