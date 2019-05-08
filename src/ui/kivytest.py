@@ -257,19 +257,23 @@ class MainScreen(Screen):
         first = self.predicter.result[0][0] 
         self.on_date_time_change(first.month, first.day, first.year, first.hour)
 
-    def on_pre_enter(self, *args):
-        # handle graph stuff
+        # initialize graph
+        self.graph_setup()
 
+    def graph_setup(self, *args):
+        """
+        Handle graph setup
+        """
+        
         plt.style.use('dark_background')
 
         loc = AutoDateLocator()
-        formatter = DateFormatter('%m-%d-%y')
-        date1 = datetime.date(2018, 1, 1)
-        date2 = datetime.date(2019, 1, 1)
-        delta = datetime.timedelta(days=7)
-        dates = drange(date1, date2, delta)
-        s = np.random.rand(len(dates))  # make up some random y values
-
+        formatter = DateFormatter('%m-%d-%y\n%H:%M')
+        dates = []
+        s = []
+        for date in self.predicter.result:
+            dates.append(datetime.datetime(date[0].year, date[0].month, date[0].day, date[0].hour, date[0].minute))
+            s.append(round(sum(date[2]) / date[4] * 100))
         fig, ax = plt.subplots()
 
         ax.xaxis.set_major_locator(loc)
@@ -294,7 +298,6 @@ class MainScreen(Screen):
         mapping = {}
         for index in range(len(self.predicter.result)):
             raw_data = self.predicter.result[index][0]
-            print raw_data.month, raw_data.day, raw_data.year, raw_data.hour
             mapping[tuple((raw_data.month, raw_data.day, raw_data.year, raw_data.hour))] = index
         self.indices = mapping
 
