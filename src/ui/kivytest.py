@@ -17,6 +17,8 @@ from kivymd.elevationbehavior import RectangularElevationBehavior
 from theming import ThemableBehavior, ThemeManager
 from kivy.metrics import dp
 from kivy.uix.widget import Widget
+from kivy.uix.filechooser import FileChooserListView
+from kivy.uix.popup import Popup
 import matplotlib.pyplot as plt
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 import matplotlib.font_manager as fm
@@ -43,36 +45,36 @@ avenir3 = fm.FontProperties(fname='fonts/Avenir3.otf')
 rcParams.update({'figure.autolayout': True})
 
 LabelBase.register(name="Gotham",
-    fn_regular= "fonts/Gotham Light Regular.otf"
-    )
+        fn_regular= "fonts/Gotham Light Regular.otf"
+        )
 
 LabelBase.register(name="GothamBook",
-    fn_regular= "fonts/GothamBook.ttf"
-    )
+        fn_regular= "fonts/GothamBook.ttf"
+        )
 
 LabelBase.register(name="GothamB",
-    fn_regular= "fonts/Gotham-Bold.otf"
-    )
+        fn_regular= "fonts/Gotham-Bold.otf"
+        )
 
 LabelBase.register(name="GothamM",
-    fn_regular= "fonts/GothamMedium.ttf"
-    )
+        fn_regular= "fonts/GothamMedium.ttf"
+        )
 
 LabelBase.register(name="Avenir3",
-    fn_regular= "fonts/Avenir3.otf"
-    )
+        fn_regular= "fonts/Avenir3.otf"
+        )
 
 LabelBase.register(name="Avenir2",
-    fn_regular= "fonts/Avenir2.otf"
-    )
+        fn_regular= "fonts/Avenir2.otf"
+        )
 
 LabelBase.register(name="SegoeL",
-    fn_regular= "fonts/segoeuil.ttf"
-    )
+        fn_regular= "fonts/segoeuil.ttf"
+        )
 
 LabelBase.register(name="Segoe",
-    fn_regular= "fonts/SEGOEUI.TTF"
-    )
+        fn_regular= "fonts/SEGOEUI.TTF"
+        )
 
 class HoverBehavior(object):
     hovered = BooleanProperty(False)
@@ -109,7 +111,27 @@ class HoverBehavior(object):
 Factory.register('HoverBehavior', HoverBehavior)
 
 class StartScreen(Screen):
-    pass
+
+    def dismiss_popup(self):
+        self._popup.dismiss()
+    
+    def show_load(self):
+        content = LoadDialog(load = self.load, cancel = self.dismiss_popup)
+        self._popup = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load(self, path, filename):
+        # do some magic to get relative path
+        filename = os.path.join(path, filename[0])
+        predicter = PredictSources(path_to_data=filename, path_to_energy="../../data/2018load.csv")
+        self.manager.get_screen('main').predicter = predicter
+        self.manager.get_screen('main').on_predict()
+        self.dismiss_popup()
+        self.manager.current = 'main'
+
+class LoadDialog(FloatLayout):
+    load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
 
 class MainScreen(Screen):
     c1 = StringProperty("#2a2a2a")
@@ -139,21 +161,41 @@ class MainScreen(Screen):
     sum_energy_saved = NumericProperty()
 
     def __init__(self, **kwargs):
-        # get prediction class
-        self.predicter = PredictSources(path_to_data="../../data/3days.txt", path_to_energy="../../data/2018load.csv")
-        
+        self.predicter = None
+
         self.dropdown = CustomDropDown()
         self.dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         super(MainScreen, self).__init__(**kwargs)
         
+        # initialize all fields with empty data
+        self.capacity = [0.0, 0.0, 0.0]
+        self.sum_net_energy = [0.0, 0.0, 0.0]
+        self.sum_total_energy_needed = 0.0
+        self.sum_energy_used = [0.0, 0.0, 0.0, 0.0]
+        self.sum_energy_saved = 0.0
+        self.update_date_time(1, 1, 2019, 0, 0)
+        self.temp = 0.0
+        self.cloud_cover = ""
+        self.wind_speed = 0.0
+        self.energy_gain = [0.0, 0.0, 0.0]
+        self.energy_loss = [0.0, 0.0, 0.0]
+        self.energy_levels = [0.0, 0.0, 0.0]
+        self.total_gain = 0.0
+        self.total_loss = 0.0
+
+    def on_predict(self):
+        """
+        This method should run once we have a PredictSources
+        instance that has read in the provided file
+        and predicted for the entire provided timespan
+        """
         # properties that do not change
         self.capacity = self.predicter.capacity
-        print self.capacity
         self.dates_to_indices()
 
         # calculate statistics over total time period
         self.sum_net_energy = [round(i, 3) for i in self.predicter.result[len(self.predicter.result) - 1][3]]
-        
+
         self.sum_total_energy_needed = 0
         self.sum_energy_used = [0.0, 0.0, 0.0, 0.0]
         self.sum_energy_saved = 0
@@ -163,7 +205,7 @@ class MainScreen(Screen):
             self.sum_energy_used[3] += tuple[4] - sum(tuple[2])
             self.sum_total_energy_needed += tuple[4]
             self.sum_energy_saved += sum(tuple[2])
-        
+
         self.sum_total_energy_needed = round(self.sum_total_energy_needed / 1000, 3)
         self.sum_energy_saved = round(self.sum_energy_saved, 3)
         self.sum_energy_used = [round(i, 3) for i in self.sum_energy_used]
@@ -176,7 +218,7 @@ class MainScreen(Screen):
         # handle graph stuff
 
         plt.style.use('dark_background')
-        
+
         loc = AutoDateLocator()
         formatter = DateFormatter('%m-%d-%y')
         date1 = datetime.date(2018, 1, 1)
@@ -186,7 +228,7 @@ class MainScreen(Screen):
         s = np.random.rand(len(dates))  # make up some random y values
 
         fig, ax = plt.subplots()
-        
+
         ax.xaxis.set_major_locator(loc)
         ax.xaxis.set_major_formatter(formatter)
         ax.set_facecolor('#232323')
@@ -237,6 +279,9 @@ class MainScreen(Screen):
     def click_file(self):
         self.dropdown.open(self)
 
+    def dismiss_popup(self):
+        self._popup.dismiss()
+
 class CustomDropDown(DropDown):
     pass
 
@@ -256,4 +301,4 @@ class FirstKivy(App):
 
 if __name__ == "__main__":
     FirstKivy().run()
-    
+
