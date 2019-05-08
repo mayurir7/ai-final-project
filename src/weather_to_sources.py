@@ -296,6 +296,7 @@ class Runner():
         energy_left = list(nextState.energy_levels)
         self.state = nextState
         if self.debug:
+            print "DATE: ", current_raw_data.month, current_raw_data.day, current_raw_data.hour
             print "ACTION: " , action
             print "ENERGY_GAINED: ", energy_gained
             print "ENERGY_NEEDED: ", energy_needed
