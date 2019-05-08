@@ -26,6 +26,7 @@ from matplotlib.dates import (DateFormatter, AutoDateLocator, drange)
 import numpy as np
 import datetime
 from matplotlib import rcParams
+import pickle
 
 # do some black magic to import from parent folder
 import os, sys, inspect
@@ -111,26 +112,65 @@ class HoverBehavior(object):
 Factory.register('HoverBehavior', HoverBehavior)
 
 class StartScreen(Screen):
+    
+    def show_load(self):
+	self.loadsave = LoadSave()
+        self.loadsave.show_load(self.load)
+    
+    def load(self, path, filename):
+        self.manager.get_screen('main').predicter = self.loadsave.load_predicter(path, filename)
+        self.manager.get_screen('main').on_predict()
+        self.manager.current = 'main'
+
+class LoadSave(FloatLayout):
+    loadfile = ObjectProperty(None)
+    savefile = ObjectProperty(None)
+    text_input = ObjectProperty(None)
+    to_save = None
 
     def dismiss_popup(self):
         self._popup.dismiss()
-    
-    def show_load(self):
-        content = LoadDialog(load = self.load, cancel = self.dismiss_popup)
-        self._popup = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
+
+    def show_load(self, load):
+        content = LoadDialog(load=load, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Load file", content=content,
+                            size_hint=(0.9, 0.9))
         self._popup.open()
 
-    def load(self, path, filename):
-        # do some magic to get relative path
+    def show_save(self):
+        content = SaveDialog(save=self.save, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Save file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load_predicter(self, path, filename):
         filename = os.path.join(path, filename[0])
         predicter = PredictSources(path_to_data=filename, path_to_energy="../../data/2018load.csv")
-        self.manager.get_screen('main').predicter = predicter
-        self.manager.get_screen('main').on_predict()
+	predicter.prediction()
         self.dismiss_popup()
-        self.manager.current = 'main'
+	return predicter
+
+    def load_predictions(self, path, filename):
+	filename = os.path.join(path, filename[0])
+	predicter = PredictSources(path_to_energy="../../data/2018load.csv")
+	predicter.result = pickle.load(open(filename))
+	self.dismiss_popup()
+	return predicter
+
+    def save(self, path, filename):
+	print path , filename
+        filename = os.path.join(path, filename)
+	with open(filename, 'wb') as f:
+	    pickle.dump(self.to_save, f)
+        self.dismiss_popup()
 
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+class SaveDialog(FloatLayout):
+    save = ObjectProperty(None)
+    text_input = ObjectProperty(None)
     cancel = ObjectProperty(None)
 
 class MainScreen(Screen):
@@ -279,8 +319,20 @@ class MainScreen(Screen):
     def click_file(self):
         self.dropdown.open(self)
 
-    def dismiss_popup(self):
-        self._popup.dismiss()
+    def save_predictions(self):
+        self.loadsave = LoadSave()
+	self.loadsave.to_save = self.predicter.result
+	self.loadsave.show_save()
+
+    def load_predictions(self):
+	self.loadsave = LoadSave()
+	self.loadsave.show_load(self.loadsave.load_predictions)
+	self.on_predict()
+
+    def load_new(self):
+	self.loadsave = LoadSave()
+	self.predicter = self.loadsave.show_load(self.loadsave.load_predicter)
+	self.on_predict()
 
 class CustomDropDown(DropDown):
     pass

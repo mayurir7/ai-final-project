@@ -19,8 +19,6 @@ class PredictSources():
         self.capacity = list(self.runner.features.capacity) #capacity
         self.result = []
 
-        self.prediction()
-
     def getWeights(self):
         """
         Read in final weights learned from training
@@ -47,5 +45,6 @@ class PredictSources():
 
 if __name__ == '__main__':
     test = PredictSources(path_to_data = "../data/3days.txt", path_to_energy="../data/2018load.csv")
+    test.prediction()
     for tuple in test.result:
         print tuple[2] , tuple[3] , tuple[4]

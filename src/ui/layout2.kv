@@ -47,6 +47,33 @@ BoxLayout:
                 on_release:
                     root.load(filechooser.path, filechooser.selection)
 
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0]
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)
+
 <MainScreen>:
     canvas:
         Color: 
@@ -1426,7 +1453,7 @@ BoxLayout:
                     width: 150
                     background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
                     background_down: 'images/LightGrey.jpg'
-                    on_release: dropdown.select('First Item')
+                    on_release: root.load_new()
                 HoverButton:
                     font_name: "Segoe"
                     font_size: 12
@@ -1437,7 +1464,7 @@ BoxLayout:
                     width: 150
                     background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
                     background_down: 'images/LightGrey.jpg'
-                    on_release: dropdown.select('First Item')
+                    on_release: root.load_predictions()
                 HoverButton:
                     font_name: "Segoe"
                     font_size: 12
@@ -1448,7 +1475,7 @@ BoxLayout:
                     width: 150
                     background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
                     background_down: 'images/LightGrey.jpg'
-                    on_release: dropdown.select('First Item')
+                    on_release: root.save_predictions()
             HoverButton:
                 size_hint_x: None
                 width: 100
