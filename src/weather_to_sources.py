@@ -54,7 +54,7 @@ class FeatureExtractor():
         while weather_reader.canGetForecast():
             forecast = weather_reader.getForecast() #forecast = list of 24 tuples of (windSpeed, sunlight, energy_needed)
             # store raw numbers
-            self.raw_data.append(forecast[0])
+            self.raw_data.append(copy.deepcopy(forecast[0]))
             self.energy_needed.append(forecast[0].ERCOT)
             self.energy_gained.append((self.calculate_wind_power(forecast[0].windSpeed), self.calculate_solar_power(forecast[0].sunlight), self.calculate_hydro_power()))
             # calculate features
@@ -237,6 +237,7 @@ class Runner():
         """
         incr = max_energy_needed / 100
         increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, max_energy_needed, incr) if max_energy_needed > 1000 else list())
+        #increments = range(0, 10)
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
@@ -297,6 +298,7 @@ class Runner():
         energy_left = list(nextState.energy_levels)
         self.state = nextState
         if self.debug:
+            print "DATE: " , current_raw_data.month, current_raw_data.day, current_raw_data.hour
             print "ACTION: " , action
             print "ENERGY_GAINED: ", energy_gained
             print "ENERGY_NEEDED: ", energy_needed
