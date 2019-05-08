@@ -252,7 +252,7 @@ class Runner():
         if random.random() <= epsilon:
             # choose random action
             if self.debug:
-                print "chose random action"
+                self.debug_file.write("chose random action\n")
             index = (int)(random.random() * len(actions))
             return actions[index]
         else:
@@ -297,6 +297,12 @@ class Runner():
         current_raw_data = self.features.getRawData(self.state)
         energy_left = list(nextState.energy_levels)
         self.state = nextState
+        if self.debug:
+            print "ACTION: " , action
+            print "ENERGY_GAINED: ", energy_gained
+            print "ENERGY_NEEDED: ", energy_needed
+            print "ENERGY_LEFT: ", energy_left
+            print "EPSILON: ", self.epsilon
         return current_raw_data, energy_gained, action, energy_left, energy_needed
 
     def iterate(self):
@@ -326,10 +332,10 @@ class Runner():
         self.learner.update(self.state, action, nextState, reward)
         self.state = nextState
         if self.debug:
-            print "ACTION: " , action
-            print "WEIGHTS: ", self.learner.weights
-            print "ENERGY_GAINED: ", energy_gained
-            print "ENERGY_NEEDED", energy_needed
+            self.debug_file.write("ACTION: " + str(action) + "\n")
+            self.debug_file.write("WEIGHTS: " + str(self.learner.weights) + "\n")
+            self.debug_file.write("ENERGY_GAINED: " + str(energy_gained) + "\n")
+            self.debug_file.write("ENERGY_NEEDED" + str(energy_needed) + "\n")
 
     def calculateReward(self, state, action, weights):
         """
@@ -349,7 +355,7 @@ class Runner():
         reward = (1 / coal_used) + (renewables) + (1/diff)
 
         if self.debug:
-            print "REWARD", reward
+            self.debug_file.write("REWARD" + str(reward) + "\n")
 
         return reward
 
@@ -358,23 +364,25 @@ class Runner():
         incr = 0.95
         for idx in range(self.iterations):
             if self.debug:
-                print "-----------------\nITERATION #" , idx
+                self.debug_file.write("-----------------\nITERATION #" + str(idx) + "\n")
             self.iterate()
             if idx % 10 == 0:
                 self.epsilon = self.epsilon * incr
                 incr = incr * 0.99
             if self.debug:
-                print "ENERGY LEVELS: ", self.state.energy_levels #logging
-                print "epsilon: " , self.epsilon
+                self.debug_file.write("ENERGY LEVELS: " + str(self.state.energy_levels) + "\n")
+                self.debug_file.write("epsilon: " + str(self.epsilon) + "\n")
 
 if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
     debug = True
     test = Runner(1000, 70000, 0.5, 0.1, 0.5, debug=debug)
     if debug:
-        print "STARTING WEIGHTS: " , test.learner.weights
-        print "STARTING ENERGY LEVELS: ", test.state.energy_levels
-        print "CAPACITY: ", test.features.capacity
+        debug_file = open("debug.txt", 'wb')
+        test.debug_file = debug_file
+        test.debug_file.write("STARTING WEIGHTS: " + str(test.learner.weights) + "\n")
+        test.debug_file.write("STARTING ENERGY LEVELS: " + str(test.state.energy_levels) + "\n")
+        test.debug_file.write("CAPACITY: " + str(test.features.capacity) + "\n")
     test.run()
 
 
