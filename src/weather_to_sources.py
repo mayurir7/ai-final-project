@@ -7,6 +7,7 @@ import random
 import pickle
 import csv
 import os
+import copy
 
 class State():
     """
@@ -279,7 +280,7 @@ class Runner():
         # take optimal action
         action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
-        nextState = self.state
+        nextState = copy.deepcopy(self.state)
         if nextState.hour >= 23:
             nextState.day += 1
             nextState.hour = 0
@@ -308,7 +309,7 @@ class Runner():
         # take optimal action
         action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
-        nextState = self.state
+        nextState = copy.deepcopy(self.state)
         if nextState.hour >= 23:
             nextState.day += 1
             nextState.hour = 0
