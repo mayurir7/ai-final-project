@@ -26,6 +26,7 @@ from matplotlib.dates import (DateFormatter, AutoDateLocator, drange)
 import numpy as np
 import datetime
 from matplotlib import rcParams
+import pickle
 
 # do some black magic to import from parent folder
 import os, sys, inspect
@@ -111,26 +112,70 @@ class HoverBehavior(object):
 Factory.register('HoverBehavior', HoverBehavior)
 
 class StartScreen(Screen):
+    
+    def show_load(self, load):
+	self.loadsave = LoadSave()
+        self.loadsave.show_load(load)
+    
+    def load_predictions(self, path, filename):
+        self.manager.get_screen('main').predicter = self.loadsave.load_predictions(path, filename)
+        self.manager.get_screen('main').on_predict()
+        self.manager.current = 'main'
+
+    def load_predicter(self, path, filename):
+        self.manager.get_screen('main').predicter = self.loadsave.load_predicter(path, filename)
+        self.manager.get_screen('main').on_predict()
+        self.manager.current = 'main'
+
+class LoadSave(FloatLayout):
+    loadfile = ObjectProperty(None)
+    savefile = ObjectProperty(None)
+    text_input = ObjectProperty(None)
+    to_save = None
 
     def dismiss_popup(self):
         self._popup.dismiss()
-    
-    def show_load(self):
-        content = LoadDialog(load = self.load, cancel = self.dismiss_popup)
-        self._popup = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
+
+    def show_load(self, load):
+        content = LoadDialog(load=load, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Load file", content=content,
+                            size_hint=(0.9, 0.9))
         self._popup.open()
 
-    def load(self, path, filename):
-        # do some magic to get relative path
+    def show_save(self):
+        content = SaveDialog(save=self.save, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Save file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load_predicter(self, path, filename):
         filename = os.path.join(path, filename[0])
         predicter = PredictSources(path_to_data=filename, path_to_energy="../../data/2018load.csv")
-        self.manager.get_screen('main').predicter = predicter
-        self.manager.get_screen('main').on_predict()
+	predicter.prediction()
         self.dismiss_popup()
-        self.manager.current = 'main'
+	return predicter
+
+    def load_predictions(self, path, filename):
+	filename = os.path.join(path, filename[0])
+	predicter = PredictSources(path_to_energy="../../data/2018load.csv")
+	predicter.result = pickle.load(open(filename))
+	self.dismiss_popup()
+	return predicter
+
+    def save(self, path, filename):
+	print path , filename
+        filename = os.path.join(path, filename)
+	with open(filename, 'wb') as f:
+	    pickle.dump(self.to_save, f)
+        self.dismiss_popup()
 
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+class SaveDialog(FloatLayout):
+    save = ObjectProperty(None)
+    text_input = ObjectProperty(None)
     cancel = ObjectProperty(None)
 
 class MainScreen(Screen):
@@ -161,13 +206,12 @@ class MainScreen(Screen):
     sum_energy_saved = NumericProperty()
 
     def __init__(self, **kwargs):
-        self.predicter = None
-
         self.dropdown = CustomDropDown()
         self.dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         super(MainScreen, self).__init__(**kwargs)
         
         # initialize all fields with empty data
+        self.predicter = None
         self.capacity = [0.0, 0.0, 0.0]
         self.sum_net_energy = [0.0, 0.0, 0.0]
         self.sum_total_energy_needed = 0.0
@@ -242,6 +286,12 @@ class MainScreen(Screen):
         self.ids.test.add_widget(FigureCanvasKivyAgg(plt.gcf()))
 
     def dates_to_indices(self):
+        """
+        Takes all of the dates over the predicter's
+        range of data and maps them to indices
+        into the predicter's results array for
+        easier access later
+        """
         mapping = {}
         for index in range(len(self.predicter.result)):
             raw_data = self.predicter.result[index][0]
@@ -249,18 +299,30 @@ class MainScreen(Screen):
         self.indices = mapping
 
     def update_date_time(self, month, day, year, hour, minute):
+        """
+        Given a date and time, converts to strings
+        for easier display on UI
+        """
         self.date = datetime.datetime(year, month, day, hour, minute)
         self.date_str = self.date.strftime("%B %d, %Y")
         self.time = self.date.strftime("%H:%M")
 
     def percentage(self, array):
+        """
+        Given an array, turns into percentages
+        assuming that the "whole" is the capacity
+        """
         array = list(array)
         for index in range(len(self.capacity)):
             array[index] = round(array[index] / self.capacity[index] * 100.0, 2)
         return array
 
     def on_date_time_change(self, month, day, year, hour):
-        # updates the text labels based on the prediction for that date/time
+        """
+        Given a date and time, updates all text labels
+        in day report to match the data for that date
+        and time
+        """
         entry = self.predicter.result[self.indices[(month, day, year, hour)]]
         self.update_date_time(month, day, year, hour, entry[0].minute)
         self.temp = entry[0].temperature
@@ -276,11 +338,54 @@ class MainScreen(Screen):
     def on_leave(self, *args):
         self.ids.test.remove_widget(self.ids.test.children[0])
 
+    # Methods to deal with File menu and its options
+
     def click_file(self):
         self.dropdown.open(self)
+    
+    def save_plan(self):
+        """
+        Callback method called when 'Save Plan'
+        option clicked in File menu
+        """
+        self.loadsave = LoadSave()
+	self.loadsave.to_save = self.predicter.result
+	self.loadsave.show_save()
 
-    def dismiss_popup(self):
-        self._popup.dismiss()
+    def load_predictions(self, path, filename):
+        """
+        Wrapper method that uses LoadSave to load
+        a pre-calculated set of predictions and then
+        re-calculate numbers to show on main screen
+        """
+        self.predicter = self.loadsave.load_predictions(path, filename)
+        self.on_predict()
+        #self.dropdown.close(self)
+
+    def open_plan(self):
+	"""
+        Callback method called when 'Open Plan'
+        option clicked on file menu
+        """
+        self.loadsave = LoadSave()
+	self.loadsave.show_load(self.load_predictions)
+
+    def load_predicter(self, path, filename):
+        """
+        Wrapper method that loads weather data, makes
+        new set of predictions, and re-calculates
+        numbers to display
+        """
+        self.predicter = self.loadsave.load_predicter(path, filename)
+        self.on_predict()
+
+    def new_plan(self):
+	"""
+        Callback method called when 'New Plan' option
+        selected on File menu
+        """
+        self.loadsave = LoadSave()
+	self.loadsave.show_load(self.load_predicter)
 
 class CustomDropDown(DropDown):
     pass

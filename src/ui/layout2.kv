@@ -26,8 +26,13 @@ BoxLayout:
             text: "load data"
             font_name: "Gotham"
             font_size: 30
-            on_press: root.show_load()
-
+            on_press: root.show_load(root.load_predicter)
+        Button:
+            text: "load predictions"
+            font_name: "Gotham"
+            font_size: 30
+            on_press: root.show_load(root.load_predictions)
+        
 <LoadDialog>:
     BoxLayout:
         size: root.size
@@ -46,6 +51,33 @@ BoxLayout:
                 text: "Load"
                 on_release:
                     root.load(filechooser.path, filechooser.selection)
+
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0]
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)
 
 <MainScreen>:
     canvas:
@@ -1426,7 +1458,9 @@ BoxLayout:
                     width: 150
                     background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
                     background_down: 'images/LightGrey.jpg'
-                    on_release: dropdown.select('First Item')
+                    on_release:
+                        root.new_plan()
+                        dropdown.dismiss()
                 HoverButton:
                     font_name: "Segoe"
                     font_size: 12
@@ -1437,7 +1471,9 @@ BoxLayout:
                     width: 150
                     background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
                     background_down: 'images/LightGrey.jpg'
-                    on_release: dropdown.select('First Item')
+                    on_release:
+                        root.open_plan()
+                        dropdown.dismiss()
                 HoverButton:
                     font_name: "Segoe"
                     font_size: 12
@@ -1448,7 +1484,9 @@ BoxLayout:
                     width: 150
                     background_normal: 'images/LightBlue.png' if self.hovered else 'images/DarkGrey.png'
                     background_down: 'images/LightGrey.jpg'
-                    on_release: dropdown.select('First Item')
+                    on_release:
+                        root.save_plan()
+                        dropdown.dismiss()
             HoverButton:
                 size_hint_x: None
                 width: 100
