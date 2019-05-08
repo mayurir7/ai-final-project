@@ -139,32 +139,36 @@ class MainScreen(Screen):
     sum_energy_saved = NumericProperty()
 
     def __init__(self, **kwargs):
+        # get prediction class
+        self.predicter = PredictSources(path_to_data="../../data/3days.txt", path_to_energy="../../data/2018load.csv")
+        
         self.dropdown = CustomDropDown()
         self.dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         super(MainScreen, self).__init__(**kwargs)
         
-        # get prediction class
-        self.predicter = PredictSources(path_to_data="../../data/10monthsV2.txt", path_to_energy="../../data/2018load.csv")
-        
         # properties that do not change
-        self.capacity = self.predicter.startingEnergyLevel
+        self.capacity = self.predicter.capacity
         print self.capacity
         self.dates_to_indices()
 
-        # TODO: calculate these numbers
+        # calculate statistics over total time period
+        self.sum_net_energy = [round(i, 3) for i in self.predicter.result[len(self.predicter.result) - 1][3]]
+        
         self.sum_total_energy_needed = 0
-        self.sum_net_energy = self.predicter.result[len(self.predicter.result) - 1][3]
         self.sum_energy_used = [0.0, 0.0, 0.0, 0.0]
         self.sum_energy_saved = 0
-        
         for tuple in self.predicter.result:
             for idx in range(len(self.sum_energy_used) - 1):
                 self.sum_energy_used[idx] += tuple[2][idx]
             self.sum_energy_used[3] += tuple[4] - sum(tuple[2])
             self.sum_total_energy_needed += tuple[4]
             self.sum_energy_saved += sum(tuple[2])
+        
+        self.sum_total_energy_needed = round(self.sum_total_energy_needed / 1000, 3)
+        self.sum_energy_saved = round(self.sum_energy_saved, 3)
+        self.sum_energy_used = [round(i, 3) for i in self.sum_energy_used]
 
-        # initialize properties        
+        # initialize dynamic hourly properties
         first = self.predicter.result[0][0] 
         self.on_date_time_change(first.month, first.day, first.year, first.hour)
 
@@ -210,7 +214,7 @@ class MainScreen(Screen):
     def percentage(self, array):
         array = list(array)
         for index in range(len(self.capacity)):
-            array[index] = array[index] / self.capacity[index] * 100.0
+            array[index] = round(array[index] / self.capacity[index] * 100.0, 2)
         return array
 
     def on_date_time_change(self, month, day, year, hour):

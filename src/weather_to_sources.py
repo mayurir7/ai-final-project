@@ -235,8 +235,8 @@ class Runner():
         Returns an array of actions for the largest energy needed
         """
         incr = max_energy_needed / 100
-        increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, max_energy_needed, incr) if max_energy_needed > 1000 else list())
-        #increments = range(0, 10)
+        #increments = range(0,100) + (range(100, 1000, 50) if max_energy_needed > 1000 else range(100, max_energy_needed, 50)) + (range(1000, max_energy_needed, incr) if max_energy_needed > 1000 else list())
+        increments = range(0, 50, 1) + range(20000, 70000, 1000)
         result = [item for item in itertools.product(increments, repeat=3)]
         return result
 
