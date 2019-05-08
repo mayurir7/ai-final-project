@@ -80,4 +80,12 @@ if __name__ == '__main__':
 # ('total_energy_needed', 24830406.23999998)
 # ('total_coal_used', 13641855.240000002)
 
+#january
+# ('total_renewables_used', 9456142.0)
+# ('total_energy_levels', 147463509.14363718)
+# ('total_energy_needed', 30366945.820000038)
+# ('total_coal_used', 20910803.820000008)
+# ('renewable utilization', 0.06412530160793355)
+
+
 
