@@ -40,11 +40,44 @@ class PredictSources():
         """
 
         for index in range(len(self.runner.features.raw_data) - 1):
+            print"-----------------"
+            print "ITERATION: ", index
             raw_data, energy_gained, action, energy_levels, energy_needed = self.runner.predict_iterate()
             self.result.append((self.runner.features.raw_data[index], energy_gained, action, energy_levels, energy_needed))
 
 if __name__ == '__main__':
-    test = PredictSources(path_to_data = "../data/3days.txt", path_to_energy="../data/2018load.csv")
+    test = PredictSources(path_to_data = "../data/january.txt", path_to_energy="../data/2018load.csv")
     test.prediction()
+    total_energy_levels = 0.0
+    total_renewables_used = 0.0
+    total_energy_needed = 0.0
+    total_coal_used = 0.0
     for tuple in test.result:
-        print tuple[2] , tuple[3] , tuple[4]
+        actions = tuple[2]
+        energy_levels = tuple[3]
+        energy_needed = tuple[4]
+        renewables_used_per_hour = 0.0
+        
+        for action in actions:
+            total_renewables_used += action
+            renewables_used_per_hour += action
+        total_coal_used += energy_needed - renewables_used_per_hour
+        for energy in energy_levels:
+            total_energy_levels += energy
+        total_energy_needed += energy_needed
+        print actions, energy_levels, energy_needed
+
+    print("total_renewables_used", total_renewables_used)
+    print("total_energy_levels", total_energy_levels)
+    print("total_energy_needed", total_energy_needed)
+    print("total_coal_used", total_coal_used)
+
+    print("renewable utilization", total_renewables_used / total_energy_levels)
+
+# april:
+# ('total_renewables_used', 11188551.0)
+# ('total_energy_levels', 35319030.79544331)
+# ('total_energy_needed', 24830406.23999998)
+# ('total_coal_used', 13641855.240000002)
+
+
