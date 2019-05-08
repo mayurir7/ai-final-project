@@ -179,11 +179,6 @@ class DataReader(Reader):
                 suncond = .8
             #else:
             #    conds.add(cond)
-            if(hour == 0 and lasthour != 0):
-                day = day + 1
-                if(day > daysinmonth[month]):
-                    day = 1
-                    month = month + 1
             if(month == 3 and day == 11 and year == 2018 and (hour + 1) == 3):
                 #DST
                 continue

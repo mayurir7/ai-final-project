@@ -68,7 +68,6 @@ class FeatureExtractor():
                 hydro_power += self.calculate_hydro_power()
             self.features.append((wind_power, solar_power, hydro_power))
             weather_reader.advanceTime()
-        print self.raw_data
 
     def calculate_wind_power(self, wind_speed):
         """
@@ -281,7 +280,7 @@ class Runner():
         # take optimal action
         action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
-        nextState = self.state
+        nextState = copy.deepcopy(self.state)
         if nextState.hour >= 23:
             nextState.day += 1
             nextState.hour = 0
@@ -317,7 +316,7 @@ class Runner():
         # take optimal action
         action = self.getAction(self.state, legalActions, self.epsilon)
         # calculate next state
-        nextState = self.state
+        nextState = copy.deepcopy(self.state)
         if nextState.hour >= 23:
             nextState.day += 1
             nextState.hour = 0
