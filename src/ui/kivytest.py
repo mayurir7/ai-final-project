@@ -163,7 +163,6 @@ class LoadSave(FloatLayout):
 	return predicter
 
     def save(self, path, filename):
-	print path , filename
         filename = os.path.join(path, filename)
 	with open(filename, 'wb') as f:
 	    pickle.dump(self.to_save, f)
@@ -295,6 +294,7 @@ class MainScreen(Screen):
         mapping = {}
         for index in range(len(self.predicter.result)):
             raw_data = self.predicter.result[index][0]
+            print raw_data.month, raw_data.day, raw_data.year, raw_data.hour
             mapping[tuple((raw_data.month, raw_data.day, raw_data.year, raw_data.hour))] = index
         self.indices = mapping
 
