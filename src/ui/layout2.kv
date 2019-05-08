@@ -26,7 +26,26 @@ BoxLayout:
             text: "load data"
             font_name: "Gotham"
             font_size: 30
-            on_press: root.manager.current = 'main'
+            on_press: root.show_load()
+
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+            Button:
+                text: "Load"
+                on_release:
+                    root.load(filechooser.path, filechooser.selection)
 
 <MainScreen>:
     canvas:
@@ -740,7 +759,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 32, 3
+                        size: 120 * root.total_gain / 100, 3
                         pos: 85, 41
                         canvas.before:
                             Color: 
@@ -785,7 +804,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 16, 3
+                        size: 120 * root.total_loss / 100, 3
                         pos: 85, 18
                         canvas.before:
                             Color: 
@@ -870,7 +889,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 60, 2
+                        size: 120 * root.energy_levels[1] / 100, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -915,7 +934,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 24, 2
+                        size: 120 * root.energy_gain[1] / 100, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -960,7 +979,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 12, 2
+                        size: 120 * root.energy_loss[1] / 100, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1044,7 +1063,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 30, 2
+                        size: 120 * root.energy_levels[0] / 100, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -1089,7 +1108,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 24, 2
+                        size: 120 * root.energy_gain[0] / 100, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1134,7 +1153,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 12, 2
+                        size: 120 * root.energy_loss[0] / 100, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1218,7 +1237,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 24, 2
+                        size: 120 * root.energy_levels[2] / 100, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -1263,7 +1282,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 24, 2
+                        size: 120 * root.energy_gain[2] / 100, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1308,7 +1327,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 12, 2
+                        size: 120 * root.energy_loss[2] / 100, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
