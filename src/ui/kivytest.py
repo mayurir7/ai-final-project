@@ -27,6 +27,7 @@ import numpy as np
 import datetime
 from matplotlib import rcParams
 import pickle
+import random
 
 # do some black magic to import from parent folder
 import os, sys, inspect
@@ -242,12 +243,22 @@ class MainScreen(Screen):
         self.sum_total_energy_needed = 0
         self.sum_energy_used = [0.0, 0.0, 0.0, 0.0]
         self.sum_energy_saved = 0
+        self.max_gain = [0.0, 0.0, 0.0]
+        self.max_loss = [0.0, 0.0, 0.0]
+        self.max_cap = [0.0, 0.0, 0.0]
         for tuple in self.predicter.result:
+            # nested bc sum_energy_used is longer than all others
             for idx in range(len(self.sum_energy_used) - 1):
                 self.sum_energy_used[idx] += tuple[2][idx]
+            # calculate coal used, energy needed, energy saved
             self.sum_energy_used[3] += tuple[4] - sum(tuple[2])
             self.sum_total_energy_needed += tuple[4]
             self.sum_energy_saved += sum(tuple[2])
+            
+            # find maxes
+            self.max_gain = [max(tuple[3][i], self.max_gain[i]) for i in range(len(self.max_gain))]
+            self.max_loss = [max(tuple[3][i], self.max_loss[i]) for i in range(len(self.max_loss))]
+            self.max_cap = [max(tuple[3][i], self.max_cap[i]) for i in range(len(self.max_cap))]
 
         self.sum_total_energy_needed = round(self.sum_total_energy_needed / 10000000, 3)
         self.sum_energy_saved = round(self.sum_energy_saved / 1000, 3)
@@ -311,14 +322,13 @@ class MainScreen(Screen):
         self.date_str = self.date.strftime("%B %d, %Y")
         self.time = self.date.strftime("%H:%M")
 
-    def percentage(self, array):
+    def percentage(self, array, total):
         """
         Given an array, turns into percentages
-        assuming that the "whole" is the capacity
         """
         array = list(array)
         for index in range(len(self.capacity)):
-            array[index] = round(array[index] / self.capacity[index] * 100.0, 2)
+            array[index] = min(round(array[index] / total[index] * 100.0, 2), 100.0)
         return array
 
     def on_date_time_change(self, month, day, year, hour):
@@ -327,17 +337,24 @@ class MainScreen(Screen):
         in day report to match the data for that date
         and time
         """
+        #TODO: delete this line
+        #month = random.randint(1, 5)
+        #day = random.randint(1, 30)
+        #year = 2018
+        #hour = random.randint(0, 23)
+        # TODO: end delete
+
         entry = self.predicter.result[self.indices[(month, day, year, hour)]]
         self.update_date_time(month, day, year, hour, entry[0].minute)
         self.temp = entry[0].temperature
         self.cloud_cover = entry[0].sunForecast
         self.wind_speed = entry[0].windSpeed * 2.237
         self.temperature = entry[0].temperature
-        self.energy_gain = self.percentage(entry[1])
-        self.energy_loss = self.percentage(entry[2])
-        self.energy_levels = self.percentage(entry[3])
-        self.total_gain = sum(entry[1]) / sum(self.capacity) * 100.0
-        self.total_loss = sum(entry[2]) / sum(self.capacity) * 100.0
+        self.energy_gain = self.percentage(entry[1], self.max_gain)
+        self.energy_loss = self.percentage(entry[2], self.max_loss)
+        self.energy_levels = self.percentage(entry[3], self.max_cap)
+        self.total_gain = sum(entry[1]) / sum(self.max_gain) * 100.0
+        self.total_loss = sum(entry[2]) / sum(self.max_loss) * 100.0
 
     def on_leave(self, *args):
         self.ids.test.remove_widget(self.ids.test.children[0])
