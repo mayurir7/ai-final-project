@@ -86,7 +86,7 @@ class FeatureExtractor():
         """
 
         fudge_factor = .75
-        panel_wattage = 144000000 #http://www.ercot.com/gridinfo/resource (144 megawatts capacity in Travis county)
+        panel_wattage = 144000000
         return (panel_wattage*sun_hours*fudge_factor) / 1000000.0
 
     def calculate_hydro_power(self):
@@ -356,7 +356,7 @@ class Runner():
         reward = (1 / coal_used) + (renewables) + (1/diff)
 
         if self.debug:
-            self.debug_file.write("REWARD" + str(reward) + "\n")
+            self.debug_file.write("REWARD: " + str(reward) + "\n")
 
         return reward
 
@@ -378,6 +378,7 @@ if __name__ == '__main__':
     # iterations, max energy, epsilon, alpha, discount
     debug = True
     test = Runner(1000, 70000, 0.5, 0.1, 0.5, debug=debug)
+
     if debug:
         debug_file = open("debug.txt", 'wb')
         test.debug_file = debug_file
@@ -385,7 +386,6 @@ if __name__ == '__main__':
         test.debug_file.write("STARTING ENERGY LEVELS: " + str(test.state.energy_levels) + "\n")
         test.debug_file.write("CAPACITY: " + str(test.features.capacity) + "\n")
     test.run()
-
 
     #pipe final weights to a file
     output_dir = "../src"
