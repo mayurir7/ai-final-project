@@ -249,7 +249,7 @@ class MainScreen(Screen):
             self.sum_total_energy_needed += tuple[4]
             self.sum_energy_saved += sum(tuple[2])
 
-        self.sum_total_energy_needed = round(self.sum_total_energy_needed / 100000, 3)
+        self.sum_total_energy_needed = round(self.sum_total_energy_needed / 10000000, 3)
         self.sum_energy_saved = round(self.sum_energy_saved / 1000, 3)
         self.sum_energy_used = [round(i / 1000.0, 3) for i in self.sum_energy_used]
 
