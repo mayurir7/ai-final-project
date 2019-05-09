@@ -1,16 +1,30 @@
 #:kivy 1.10.0
 
-<StartScreen>:
-    BoxLayout:
-        Label:
-            text: "autogrid"
-            font_name: "Gotham"
-            font_size: 40
-            bold: True
-        Button:
-            text: "load data"
-            font_name: "Gotham"
-            font_size: 30
-            on_press: root.manager.current = 'main'
-        
+BoxLayout:
+    canvas:
+        Color: 
+            rgb: [1, 1,1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Button:
+        text: "load data"
+        font_size: 30
+        text: "Open date picker"
+        size_hint: None, None
+        size: 3 * dp(48), dp(48)
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        on_release: app.show_example_date_picker()
                        
+    Label:
+        id: date_picker_label   
+        size_hint: None, None
+        halign: "right"
+        valign: "middle"
+        text: "Energy Efficiency"
+        color: [0, 0, 0]
+        text_size: self.size
+        font_size: 14
+        height: 25
+        width: 500 #padding
+        pos: 0, 225

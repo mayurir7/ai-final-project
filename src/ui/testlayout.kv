@@ -1,37 +1,111 @@
 #:kivy 1.10.0
+#:import calendar calendar
+#:import platform platform
+#:import utils kivy.utils
+<DatePicker>
+    cal_layout: cal_layout
 
-<Button>
-    font_size: 40
-    color: 0, 1, 0, 1
-    size_hint: .3, .2
+    size_hint: (None, None)
+    size: 512, 304
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    canvas:
+        Color:
+            rgb: [1, 1, 1]
+        Rectangle:
+            size: 168, 304
+            pos: [root.pos[0], root.pos[1] + root.height-dp(304)]
+        Color:
+            rgb: [0, 0, 0]
+        Rectangle:
+            size: [dp(344), dp(304)]
+            pos: [root.pos[0]+dp(168), root.pos[1]]  #+dp(334)
+    Label:
+        id: label_full_date
+        color: utils.get_color_from_hex("#111111")
+        size_hint: (None, None)
+        size: root.width, dp(30)
+        pos: (root.pos[0]+dp(16), root.pos[1]+root.height-dp(41))
+        valign: 'middle'
+        text: root.fmt_lbl_date(root.sel_year, root.sel_month, root.sel_day)
+    Label:
+        id: label_year
+        color: utils.get_color_from_hex("#111111")
+        size_hint: (None, None)
+        size: root.width, dp(30)
+        pos: (0, root.pos[1]+root.height-dp(41))
+        valign: 'middle'
+        text: str(root.sel_year)
+    GridLayout:
+        id: cal_layout
+        cols: 7
+        size: (dp(46*7), dp(32*7))
+        col_default_width: dp(39)
+        size_hint: (None, None)
+        padding: (dp(7), 0)
+        spacing: (dp(7), 0)
+        pos: (root.pos[0]+dp(168)+dp(8), root.pos[1]+dp(48))
+    Label:
+        id: label_month_selector
+        text: calendar.month_name[root.month].capitalize() + ' ' + str(root.year)
+        size_hint: (None, None)
+        size: root.width, dp(30)
+        pos: root.pos
+        pos_hint: {'center_x': 0.67, 'center_y': 0.915}
+        valign: "middle"
+        halign: "center"
+    HoverButton:
+        size_hint: (None, None)
+        size: 32, 32
+        background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
+        background_down: 'images/ClockDefault.png'
+        pos_hint: {'center_x': 0.39, 'center_y': 0.925}
+        on_release: root.change_month('prev')
+    HoverButton:
+        size_hint: (None, None)
+        size: 32, 32
+        background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
+        background_down: 'images/ClockDefault.png'
+        pos_hint: {'center_x': 0.94, 'center_y': 0.925}
+        on_release: root.change_month('next')
+    HoverButton:
+        size_hint: (None, None)
+        size: 32, 10
+        id: ok_button
+        pos: root.pos[0]+root.size[0]-self.width-dp(10), root.pos[1] + dp(10)
+        text: "OK"
+        on_release: root.ok_click()
+    HoverButton:
+        size_hint: (None, None)
+        size: 32, 10
+        id: cancel_button
+        pos: root.pos[0]+root.size[0]-self.width-ok_button.width-dp(10), root.pos[1] + dp(10)
+        text: "Cancel"
+        on_release: root.dismiss()
 
-<StartScreen>:
-    BoxLayout:
-        size_hint_y: None
-        height: "48dp"
-        spacing: "2dp"
-        padding: "2dp"
+<DayButton>
+    size_hint: None, None
+    size: (dp(32), dp(32))
+    Label:
+        #opposite_colors: root.is_selected if root.owner.sel_month == root.owner.month \
+            #and root.owner.sel_year == root.owner.year and str(self.text) == str(root.owner.sel_day) else False
+        size_hint_x: None
+        valign: 'middle'
+        halign: 'center'
+        text: root.text
 
-        ToggleButton:
-            text: "Debug"
-            id: debug
-            on_release: root.build()
-        Button:
-            text: "New shape"
-            on_release: root.push_shape()
-        Button:
-            text: "Build"
-            on_release: root.build()
-        Button:
-            text: "Reset"
-            on_release: root.reset()
+<WeekdayLabel>
+    size: (dp(32), dp(32))
+    size_hint: None, None
+    text_size: self.size
+    valign: 'bottom'
+    halign: 'center'
 
-    BoxLayout:
-        size_hint_y: None
-        height: "48dp"
-        top: root.top
-        spacing: "2dp"
-        padding: "2dp"
-        Label:
-            id: status
-            text: "Status"
+<DaySelector>
+    size: (dp(32), dp(32))
+    size_hint: (None, None)
+    canvas:
+        Color:
+            rgba: [1, 0, 0] if self.shown else [0, 0, 0, 0]
+        Ellipse:
+            size: (dp(32), dp(32))
+            pos: [self.pos[0], self.pos[1]]
