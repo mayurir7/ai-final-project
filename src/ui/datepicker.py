@@ -31,6 +31,41 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.metrics import dp
 from kivy.uix.widget import Widget
 
+LabelBase.register(name="Gotham",
+        fn_regular= "fonts/Gotham Light Regular.otf"
+        )
+
+LabelBase.register(name="GothamBook",
+        fn_regular= "fonts/GothamBook.ttf"
+        )
+
+LabelBase.register(name="GothamB",
+        fn_regular= "fonts/Gotham-Bold.otf"
+        )
+
+LabelBase.register(name="GothamM",
+        fn_regular= "fonts/GothamMedium.ttf"
+        )
+
+LabelBase.register(name="Avenir3",
+        fn_regular= "fonts/Avenir3.otf"
+        )
+
+LabelBase.register(name="Avenir2",
+        fn_regular= "fonts/Avenir2.otf"
+        )
+
+LabelBase.register(name="SegoeL",
+        fn_regular= "fonts/segoeuil.ttf"
+        )
+
+LabelBase.register(name="Segoe",
+        fn_regular= "fonts/SEGOEUI.TTF"
+        )
+
+LabelBase.register(name="SegoeSL",
+        fn_regular= "fonts/segoeuisl.ttf"
+        )
 
 class DaySelector(AnchorLayout):
     shown = BooleanProperty(False)
@@ -80,6 +115,7 @@ class DatePicker(FloatLayout, ModalView):
     cal_list = None
     cal_layout = ObjectProperty()
     sel_year = NumericProperty()
+    weekday_layout = ObjectProperty()
     sel_month = NumericProperty()
     sel_day = NumericProperty()
     day = NumericProperty()
@@ -188,7 +224,7 @@ class DatePicker(FloatLayout, ModalView):
     def generate_cal_widgets(self):
         cal_list = []
         for i in calendar.day_abbr:
-            self.cal_layout.add_widget(WeekdayLabel(text=i[0].upper()))
+            self.weekday_layout.add_widget(WeekdayLabel(text=i[0].upper()))
         for i in range(6 * 7):  # 6 weeks, 7 days a week
             db = DayButton(owner=self)
             cal_list.append(db)
@@ -244,6 +280,16 @@ class HoverButton(Button, HoverBehavior):
         pass
 
 class FirstKivy(App):
+    c1 = StringProperty("#2a2a2a")
+    c2 = StringProperty("#232323")
+    c3 = StringProperty("#111111")
+    c4 = StringProperty("#c0c0c0")
+    c5 = StringProperty("#c00000")
+    c6 = StringProperty("#30b023")
+    c7 = StringProperty("#3e3e3e")
+    wc = StringProperty("#ffffff")
+    sc = StringProperty("#ffc600")
+    hc = StringProperty("#21a5f0")
     previous_date = ObjectProperty()
     def set_previous_date(self, date_obj):
         self.previous_date = date_obj

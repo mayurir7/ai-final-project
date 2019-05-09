@@ -84,6 +84,10 @@ LabelBase.register(name="Segoe",
         fn_regular= "fonts/SEGOEUI.TTF"
         )
 
+LabelBase.register(name="SegoeSL",
+        fn_regular= "fonts/segoeuisl.ttf"
+        )
+
 class HoverBehavior(object):
     hovered = BooleanProperty(False)
     border_point= ObjectProperty(None)
@@ -189,7 +193,7 @@ class SaveDialog(FloatLayout):
 class MainScreen(Screen):
     c1 = StringProperty("#2a2a2a")
     c2 = StringProperty("#232323")
-    c3 = StringProperty("#111111")
+    c3 = StringProperty("#1a1a1a")
     c4 = StringProperty("#c0c0c0")
     c5 = StringProperty("#c00000")
     c6 = StringProperty("#30b023")
@@ -331,7 +335,7 @@ class MainScreen(Screen):
         ax.xaxis.set_major_formatter(formatter)
         ax.set_facecolor('#232323')
         fig.patch.set_facecolor('#2a2a2a')
-        plt.plot_date(dates, s, linestyle='solid', marker='None', color='#38ff38', linewidth=1)
+        plt.plot_date(dates, s, linestyle='solid', marker='None', color='#00f946', linewidth=1)
         plt.ylabel('Efficiency', fontproperties=avenir3,fontsize=10)
         plt.xlabel('Date', fontproperties=avenir3,fontsize=10)
         plt.yticks(fontproperties=segoeui, fontsize=8)
@@ -385,8 +389,8 @@ class MainScreen(Screen):
         self.energy_gain = self.percentage(entry[1], self.max_gain)
         self.energy_loss = self.percentage(entry[2], self.max_loss)
         self.energy_levels = self.percentage(entry[3], self.max_cap)
-        self.total_gain = sum(entry[1]) / sum(self.max_gain) * 100.0
-        self.total_loss = sum(entry[2]) / sum(self.max_loss) * 100.0
+        self.total_gain = round(sum(entry[1]) / sum(self.max_gain) * 100.0, 2)
+        self.total_loss = round(sum(entry[2]) / sum(self.max_loss) * 100.0, 2)
 
     def on_leave(self, *args):
         self.ids.test.remove_widget(self.ids.test.children[0])
@@ -506,6 +510,7 @@ class DatePicker(FloatLayout, ModalView):
     today = date.today()
     callback = ObjectProperty()
     background_color = ListProperty([0, 0, 0, 0.7])
+    weekday_layout = ObjectProperty()
 
     class SetDateError(Exception):
         pass
@@ -609,7 +614,7 @@ class DatePicker(FloatLayout, ModalView):
     def generate_cal_widgets(self):
         cal_list = []
         for i in calendar.day_abbr:
-            self.cal_layout.add_widget(WeekdayLabel(text=i[0].upper()))
+            self.weekday_layout.add_widget(WeekdayLabel(text=i[0].upper()))
         for i in range(6 * 7):  # 6 weeks, 7 days a week
             db = DayButton(owner=self)
             cal_list.append(db)
@@ -678,7 +683,7 @@ class TimePicker(FloatLayout, ModalView):
         self.dismiss()
 
     def change_hour(self, operation):
-        op = 1 if operation is 'down' else -1
+        op = -1 if operation is 'down' else 1
         sh = self.sel_hour
         sh = 23 if sh + op == -1 else 0 if sh + op == 24 else sh + op
         self.sel_hour = sh

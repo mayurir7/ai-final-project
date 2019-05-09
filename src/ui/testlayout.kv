@@ -4,37 +4,93 @@
 #:import utils kivy.utils
 <DatePicker>
     cal_layout: cal_layout
-
+    weekday_layout: weekday_layout
+    
     size_hint: (None, None)
-    size: 512, 304
+    size: 334, 330
     pos_hint: {'center_x': .5, 'center_y': .5}
     canvas:
         Color:
-            rgb: [1, 1, 1]
+            rgb: utils.get_color_from_hex("#232323")
         Rectangle:
-            size: 168, 304
-            pos: [root.pos[0], root.pos[1] + root.height-dp(304)]
+            size: 344, 334
+            pos: [root.pos[0], root.pos[1]]  #+dp(334)
         Color:
-            rgb: [0, 0, 0]
+            rgb: utils.get_color_from_hex("#2a2a2a")
         Rectangle:
-            size: [dp(344), dp(304)]
-            pos: [root.pos[0]+dp(168), root.pos[1]]  #+dp(334)
+            size: 324, 200
+            pos: [root.pos[0]+ 10, root.pos[1] + 50]  #+dp(334)
+        Color:
+            rgb: utils.get_color_from_hex("#1a1a1a")
+        Rectangle:
+            size: 324, 30
+            pos: [root.pos[0] + 10, root.pos[1] + 250]  #+dp(334)
+    
     Label:
         id: label_full_date
-        color: utils.get_color_from_hex("#111111")
+        color: utils.get_color_from_hex("#00f946")
         size_hint: (None, None)
-        size: root.width, dp(30)
-        pos: (root.pos[0]+dp(16), root.pos[1]+root.height-dp(41))
+        size: 170, 50
+        pos: root.pos[0], root.pos[1]
         valign: 'middle'
-        text: root.fmt_lbl_date(root.sel_year, root.sel_month, root.sel_day)
+        halign: "center"
+        font_size: 12
+        font_name: "Avenir3"
+        text: root.fmt_lbl_date(root.sel_year, root.sel_month, root.sel_day) + ', ' + str(root.sel_year)
     Label:
-        id: label_year
-        color: utils.get_color_from_hex("#111111")
+        id: label_month_selector
+        text: calendar.month_name[root.month].capitalize() + ' ' + str(root.year)
         size_hint: (None, None)
-        size: root.width, dp(30)
-        pos: (0, root.pos[1]+root.height-dp(41))
-        valign: 'middle'
-        text: str(root.sel_year)
+        size: 344, 30
+        pos: root.pos[0], root.pos[1] + 290
+        valign: "bottom"
+        halign: "center"
+        font_name: "Gotham"
+    HoverButton:
+        size_hint: (None, None)
+        size: 20,20
+        allow_stretch: True
+        background_normal: 'images/ChevronLeftHover.png' if self.hovered else 'images/ChevronLeftDefault.png'
+        background_down: 'images/ChevronLeftDefault.png'
+        pos: root.pos[0] + 20, root.pos[1] + 295
+        on_release: root.change_month('prev')
+    HoverButton:
+        size_hint: (None, None)
+        size: 20, 20
+        keep_ratio: True
+        background_normal: 'images/ChevronRightHover.png' if self.hovered else 'images/ChevronRightDefault.png'
+        background_down: 'images/ChevronRightDefault.png'
+        pos: root.pos[0] + 297, root.pos[1] + 295
+        on_release: root.change_month('next')
+    HoverButton:
+        text: "OK"
+        size_hint: (None, None)
+        font_name: "GothamM"
+        font_size: 12
+        size: 80, 30
+        pos: root.pos[0] + root.size[0]-self.width, root.pos[1] + 10
+        background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+        background_down: 'images/LightGrey.jpg'
+        on_release: root.ok_click()
+    HoverButton:
+        text: "Cancel"
+        size_hint: (None, None)
+        font_name: "GothamM"
+        font_size: 12
+        size: 80, 30
+        pos: root.pos[0] + root.size[0]- self.width * 2 - 10,  root.pos[1] + 10 
+        background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+        background_down: 'images/LightGrey.jpg'
+        on_release: root.dismiss()
+    GridLayout:
+        id: weekday_layout
+        cols: 7
+        size: 46*7, 32
+        col_default_width: 39
+        size_hint: (None, None)
+        padding: (dp(7), 0)
+        spacing: (dp(7), 0)
+        pos: (root.pos[0]+dp(10), root.pos[1]+dp(255))
     GridLayout:
         id: cal_layout
         cols: 7
@@ -43,58 +99,23 @@
         size_hint: (None, None)
         padding: (dp(7), 0)
         spacing: (dp(7), 0)
-        pos: (root.pos[0]+dp(168)+dp(8), root.pos[1]+dp(48))
-    Label:
-        id: label_month_selector
-        text: calendar.month_name[root.month].capitalize() + ' ' + str(root.year)
-        size_hint: (None, None)
-        size: root.width, dp(30)
-        pos: root.pos
-        pos_hint: {'center_x': 0.67, 'center_y': 0.915}
-        valign: "middle"
-        halign: "center"
-    HoverButton:
-        size_hint: (None, None)
-        size: 32, 32
-        background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
-        background_down: 'images/ClockDefault.png'
-        pos_hint: {'center_x': 0.39, 'center_y': 0.925}
-        on_release: root.change_month('prev')
-    HoverButton:
-        size_hint: (None, None)
-        size: 32, 32
-        background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
-        background_down: 'images/ClockDefault.png'
-        pos_hint: {'center_x': 0.94, 'center_y': 0.925}
-        on_release: root.change_month('next')
-    HoverButton:
-        size_hint: (None, None)
-        size: 32, 10
-        id: ok_button
-        pos: root.pos[0]+root.size[0]-self.width-dp(10), root.pos[1] + dp(10)
-        text: "OK"
-        on_release: root.ok_click()
-    HoverButton:
-        size_hint: (None, None)
-        size: 32, 10
-        id: cancel_button
-        pos: root.pos[0]+root.size[0]-self.width-ok_button.width-dp(10), root.pos[1] + dp(10)
-        text: "Cancel"
-        on_release: root.dismiss()
+        pos: (root.pos[0]+dp(10), root.pos[1]+dp(25))
 
 <DayButton>
     size_hint: None, None
     size: (dp(32), dp(32))
     Label:
-        #opposite_colors: root.is_selected if root.owner.sel_month == root.owner.month \
-            #and root.owner.sel_year == root.owner.year and str(self.text) == str(root.owner.sel_day) else False
         size_hint_x: None
         valign: 'middle'
         halign: 'center'
         text: root.text
+        font_name: "SegoeSL"
+        color: utils.get_color_from_hex("#111111") if root.is_selected and root.owner.sel_month == root.owner.month and root.owner.sel_year == root.owner.year and str(self.text) == str(root.owner.sel_day) else utils.get_color_from_hex("#c3c3c3")
 
 <WeekdayLabel>
     size: (dp(32), dp(32))
+    font_name: "GothamB"
+    font_size: 18
     size_hint: None, None
     text_size: self.size
     valign: 'bottom'
@@ -105,7 +126,7 @@
     size_hint: (None, None)
     canvas:
         Color:
-            rgba: [1, 0, 0] if self.shown else [0, 0, 0, 0]
-        Ellipse:
-            size: (dp(32), dp(32))
-            pos: [self.pos[0], self.pos[1]]
+            rgba: utils.get_color_from_hex("#00f946") if self.shown else [0, 0, 0, 0]
+        Rectangle:
+            size: (dp(28), dp(28))
+            pos: [self.pos[0] + 2, self.pos[1] + 2]

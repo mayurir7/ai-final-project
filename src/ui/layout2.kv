@@ -81,31 +81,90 @@ BoxLayout:
                 on_release: root.save(filechooser.path, text_input.text)
 
 <TimePicker>:
+    size_hint: (None, None)
+    size: 290, 140
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    canvas:
+        Color:
+            rgb: utils.get_color_from_hex("#232323")
+        Rectangle:
+            size: 300, 150
+            pos: [root.pos[0], root.pos[1]]
+        Color:
+            rgb: utils.get_color_from_hex("#2a2a2a")
+        Rectangle:
+            size: 82, 49
+            pos: [root.pos[0] + 17, root.pos[1] + 49]
     HoverButton:
         id: time_selector_up
         size_hint: None, None
-        size: 30, 30
-        pos: 400, 350
-        background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
-        background_down: 'images/ClockDefault.png'
+        size: 20, 20
+        pos: [root.pos[0] + 47, root.pos[1] + 108]
+        background_normal: 'images/ChevronUpHover.png' if self.hovered else 'images/ChevronUpDefault.png'
+        background_down: 'images/ChevronUpDefault.png'
         on_release: root.change_hour('up')
     Label:
+        size_hint: None, None
+        halign: "right"
+        valign: "bottom"
+        color: utils.get_color_from_hex("#c0c0c0")
+        font_name: "GothamB"
+        font_size: 30
+        size: 82, 49
+        pos: [root.pos[0] + 17, root.pos[1] + 49]
         id: time_selector_time
         text: str(root.sel_hour)
+    Label:
+        size_hint: None, None
+        halign: "left"
+        valign: "bottom"
+        color: utils.get_color_from_hex("#c0c0c0")
+        font_name: "GothamB"
+        font_size: 30
+        size: 82, 49
+        pos: [root.pos[0] + 67, root.pos[1] + 51]
+        id: time_selector_time
+        text: ':'
+    Label:
+        size_hint: None, None
+        halign: "left"
+        valign: "bottom"
+        color: utils.get_color_from_hex("#c0c0c0")
+        font_name: "GothamB"
+        font_size: 30
+        size: 82, 49
+        pos: [root.pos[0] + 94, root.pos[1] + 49]
+        id: time_selector_time
+        text: '56'
     HoverButton:
         id: time_selector_down
         size_hint: None, None
-        size: 30, 30
-        pos: 400, 200
-        background_normal: 'images/ClockHover.png' if self.hovered else 'images/ClockDefault.png'
-        background_down: 'images/ClockDefault.png'
+        size: 20, 20
+        pos: [root.pos[0] + 47, root.pos[1] + 18]
+        background_normal: 'images/ChevronDownHover.png' if self.hovered else 'images/ChevronDownDefault.png'
+        background_down: 'images/ChevronDownDefault.png'
         on_release: root.change_hour('down')
-    Button:
+    HoverButton:
         id: time_selector_ok
-        pos: 500, 30
         text: "OK"
-        on_release:root.ok_click()
-
+        size_hint: (None, None)
+        font_name: "GothamM"
+        font_size: 12
+        size: 80, 30
+        pos: root.pos[0] + 190, root.pos[1] + 88
+        background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+        background_down: 'images/LightGrey.jpg'
+        on_release: root.ok_click()
+    HoverButton:
+        text: "Cancel"
+        size_hint: (None, None)
+        font_name: "GothamM"
+        font_size: 12
+        size: 80, 30
+        pos: root.pos[0] + 190, root.pos[1] + 28
+        background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+        background_down: 'images/LightGrey.jpg'
+        on_release: root.dismiss()
 <MainScreen>:
     canvas:
         Color: 
@@ -197,7 +256,7 @@ BoxLayout:
                     text_size: self.size
                     font_name: "GothamM"
                     color: utils.get_color_from_hex(root.c4)
-                    timtime_e_font_size: 10
+                    font_size: 12
                     height: 25
                     width: 200
                     pos: 5, 7
@@ -536,19 +595,19 @@ BoxLayout:
                         size: self.size
                 Label:
                     size_hint: None, None
-                    halign: "left"
+                    halign: "right"
                     valign: "bottom"
                     text: root.time
                     text_size: self.size
                     font_name: "GothamM"
                     font_size: 32
                     height: 75
-                    width: 100
-                    pos: 30, 10
+                    width: 130
+                    pos: 0, 10
                 FloatLayout:
                     size_hint: None, None
                     size: 1, 50
-                    pos: 125, 10
+                    pos: 145, 10
                     canvas.before:
                         Color: 
                             rgb: utils.get_color_from_hex(root.c4)
@@ -564,8 +623,8 @@ BoxLayout:
                     font_name: "GothamBook"
                     font_size: 18
                     height: 75
-                    width: 150
-                    pos: 140, 15
+                    width: 200
+                    pos: 160, 15
                 HoverButton:
                     id: clock
                     size_hint: None, None
@@ -808,7 +867,7 @@ BoxLayout:
                         pos: 15, 35
                     FloatLayout:
                         size_hint: None, None
-                        size: 160, 3
+                        size: 150, 3
                         pos: 85, 41
                         canvas.before:
                             Color: 
@@ -818,7 +877,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.total_gain / 100, 3
+                        size: 150 * root.total_gain / 100, 3
                         pos: 85, 41
                         canvas.before:
                             Color: 
@@ -837,8 +896,8 @@ BoxLayout:
                         color: utils.get_color_from_hex(root.c4)
                         font_size: 10
                         height: 15
-                        width: 30
-                        pos: 260, 35
+                        width: 60
+                        pos: 250, 35
                     Label:
                         size_hint: None, None
                         halign: "left"
@@ -853,7 +912,7 @@ BoxLayout:
                         pos: 15, 12
                     FloatLayout:
                         size_hint: None, None
-                        size: 160, 3
+                        size: 150, 3
                         pos: 85, 18
                         canvas.before:
                             Color: 
@@ -863,7 +922,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.total_loss / 100, 3
+                        size: 150 * root.total_loss / 100, 3
                         pos: 85, 18
                         canvas.before:
                             Color: 
@@ -876,14 +935,14 @@ BoxLayout:
                         size_hint: None, None
                         halign: "left"
                         valign: "top"
-                        text: str(root.total_loss) + " %"
+                        text: str(root.total_loss) + "%"
                         text_size: self.size
                         font_name: "GothamB"
                         color: utils.get_color_from_hex(root.c4)
                         font_size: 10
                         height: 15
                         width: 60
-                        pos: 260, 12
+                        pos: 250, 12
                 #Sun Widget
                 RelativeLayout:
                     size_hint: None, None
@@ -938,7 +997,7 @@ BoxLayout:
                         pos: 55, 42
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -948,7 +1007,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_levels[1] / 100, 2
+                        size: 110 * root.energy_levels[1] / 100, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -968,7 +1027,7 @@ BoxLayout:
                         font_size: 9
                         height: 15
                         width: 60
-                        pos: 260, 42
+                        pos: 250, 42
                     Label:
                         size_hint: None, None
                         halign: "right"
@@ -983,7 +1042,7 @@ BoxLayout:
                         pos: 55, 24
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -993,7 +1052,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_gain[1] / 100, 2
+                        size: 110 * root.energy_gain[1] / 100, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1012,8 +1071,8 @@ BoxLayout:
                         color: utils.get_color_from_hex(root.c4)
                         font_size: 9
                         height: 15
-                        width: 30
-                        pos: 260, 24
+                        width: 60
+                        pos: 250, 24
                     Label:
                         size_hint: None, None
                         halign: "right"
@@ -1028,7 +1087,7 @@ BoxLayout:
                         pos: 55, 6
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1038,7 +1097,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_loss[1] / 100, 2
+                        size: 110 * root.energy_loss[1] / 100, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1058,7 +1117,7 @@ BoxLayout:
                         font_size: 9
                         height: 15
                         width: 60
-                        pos: 260, 6
+                        pos: 250, 6
                 RelativeLayout:
                     size_hint: None, None
                     pos: 5, 71
@@ -1112,7 +1171,7 @@ BoxLayout:
                         pos: 55, 42
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -1122,7 +1181,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_levels[0] / 100, 2
+                        size: 110 * root.energy_levels[0] / 100, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -1142,7 +1201,7 @@ BoxLayout:
                         font_size: 9
                         height: 15
                         width: 60
-                        pos: 260, 42
+                        pos: 250, 42
                     Label:
                         size_hint: None, None
                         halign: "right"
@@ -1157,7 +1216,7 @@ BoxLayout:
                         pos: 55, 24
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1167,7 +1226,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_gain[0] / 100, 2
+                        size: 110 * root.energy_gain[0] / 100, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1186,8 +1245,8 @@ BoxLayout:
                         color: utils.get_color_from_hex(root.c4)
                         font_size: 9
                         height: 15
-                        width: 30
-                        pos: 260, 24
+                        width: 60
+                        pos: 250, 24
                     Label:
                         size_hint: None, None
                         halign: "right"
@@ -1202,7 +1261,7 @@ BoxLayout:
                         pos: 55, 6
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1212,7 +1271,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_loss[0] / 100, 2
+                        size: 110 * root.energy_loss[0] / 100, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1232,7 +1291,7 @@ BoxLayout:
                         font_size: 9
                         height: 15
                         width: 60
-                        pos: 260, 6
+                        pos: 250, 6
                 RelativeLayout:
                     size_hint: None, None
                     pos: 5, 3
@@ -1286,7 +1345,7 @@ BoxLayout:
                         pos: 55, 42
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -1296,7 +1355,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_levels[2] / 100, 2
+                        size: 110 * root.energy_levels[2] / 100, 2
                         pos: 125, 49
                         canvas.before:
                             Color: 
@@ -1316,7 +1375,7 @@ BoxLayout:
                         font_size: 9
                         height: 15
                         width: 60
-                        pos: 260, 42
+                        pos: 250, 42
                     Label:
                         size_hint: None, None
                         halign: "right"
@@ -1331,7 +1390,7 @@ BoxLayout:
                         pos: 55, 24
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1341,7 +1400,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_gain[2] / 100, 2
+                        size: 110 * root.energy_gain[2] / 100, 2
                         pos: 125, 31
                         canvas.before:
                             Color: 
@@ -1360,8 +1419,8 @@ BoxLayout:
                         color: utils.get_color_from_hex(root.c4)
                         font_size: 9
                         height: 15
-                        width: 30
-                        pos: 260, 24
+                        width: 60
+                        pos: 250, 24
                     Label:
                         size_hint: None, None
                         halign: "right"
@@ -1376,7 +1435,7 @@ BoxLayout:
                         pos: 55, 6
                     FloatLayout:
                         size_hint: None, None
-                        size: 120, 2
+                        size: 110, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1386,7 +1445,7 @@ BoxLayout:
                                 size: self.size
                     FloatLayout:
                         size_hint: None, None
-                        size: 120 * root.energy_loss[2] / 100, 2
+                        size: 110 * root.energy_loss[2] / 100, 2
                         pos: 125, 13
                         canvas.before:
                             Color: 
@@ -1406,7 +1465,7 @@ BoxLayout:
                         font_size: 9
                         height: 15
                         width: 60
-                        pos: 260, 6
+                        pos: 250, 6
             FloatLayout:
                 size_hint: None, None
                 size: 1, 300
@@ -1450,8 +1509,8 @@ BoxLayout:
                 pos: 5, 5
             FloatLayout:
                 size_hint: None, None
-                size: 500, 30
-                pos: 330, 0
+                size: 650, 30
+                pos: 130, 0
                 canvas.before:
                     Color: 
                         rgb: utils.get_color_from_hex(root.c7)
@@ -1462,7 +1521,7 @@ BoxLayout:
                 id: file
                 text: "File"
                 size_hint_x: None
-                font_name: "Segoe"
+                font_name: "GothamB"
                 font_size: 12
                 width: 100
                 pos:30, 0
@@ -1476,7 +1535,7 @@ BoxLayout:
                 auto_width: False
                 width: 150
                 HoverButton:
-                    font_name: "Segoe"
+                    font_name: "GothamB"
                     font_size: 12
                     text: 'New Plan'
                     size_hint_y: None
@@ -1489,7 +1548,7 @@ BoxLayout:
                         root.new_plan()
                         dropdown.dismiss()
                 HoverButton:
-                    font_name: "Segoe"
+                    font_name: "GothamB"
                     font_size: 12
                     text: 'Open Plan'
                     size_hint_y: None
@@ -1502,7 +1561,7 @@ BoxLayout:
                         root.open_plan()
                         dropdown.dismiss()
                 HoverButton:
-                    font_name: "Segoe"
+                    font_name: "GothamB"
                     font_size: 12
                     text: 'Save Plan'
                     size_hint_y: None
@@ -1514,24 +1573,6 @@ BoxLayout:
                     on_release:
                         root.save_plan()
                         dropdown.dismiss()
-            HoverButton:
-                size_hint_x: None
-                width: 100
-                text: "Edit"
-                font_name: "Segoe"
-                font_size: 12
-                pos:130, 0
-                background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
-                background_down: 'images/LightGrey.jpg'
-            HoverButton:
-                text: "View"
-                font_name: "Segoe"
-                font_size: 12
-                size_hint_x: None
-                width: 100
-                pos:230, 0
-                background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
-                background_down: 'images/LightGrey.jpg'
             HoverButton:
                 text: "x"
                 font_name: "Gotham"
