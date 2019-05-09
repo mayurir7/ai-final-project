@@ -246,7 +246,9 @@ class MainScreen(Screen):
             DatePicker(self.set_previous_date,
                             pd.year, pd.month, pd.day).open()
         except AttributeError:
-            DatePicker(self.set_previous_date).open()
+            fdate = self.predicter.result[0][0]
+            DatePicker(self.set_previous_date,
+                            fdate.year, fdate.month, fdate.day).open()
 
     def on_predict(self):
         """
@@ -501,14 +503,14 @@ class DatePicker(FloatLayout, ModalView):
     class SetDateError(Exception):
         pass
 
-    def __init__(self, callback, year=None, month=None, day=None,
+    def __init__(self, callback, year, month, day,
                  firstweekday=0,
                  **kwargs):
         self.callback = callback
         self.cal = calendar.Calendar(firstweekday)
-        self.sel_year = year if year else self.today.year
-        self.sel_month = month if month else self.today.month
-        self.sel_day = day if day else self.today.day
+        self.sel_year = year
+        self.sel_month = month
+        self.sel_day = day
         self.month = self.sel_month
         self.year = self.sel_year
         self.day = self.sel_day
