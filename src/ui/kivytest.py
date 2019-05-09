@@ -237,8 +237,9 @@ class MainScreen(Screen):
         self.total_loss = 0.0
 
     def set_previous_date(self, date_obj):
+        # set hour to 0 if using date picker
         self.previous_date = date_obj
-        self.on_date_time_change(date_obj.month, date_obj.day, date_obj.year, 4)
+        self.on_date_time_change(date_obj.month, date_obj.day, date_obj.year, date_obj.hour)
 
     def show_example_date_picker(self):
         pd = self.previous_date
@@ -256,6 +257,14 @@ class MainScreen(Screen):
             # make date picker that starts on first date in data
             DatePicker(self.set_previous_date,
                             fdate.year, fdate.month, fdate.day, maxdate, mindate).open()
+
+    def show_time_picker(self):
+        try:
+            TimePicker(self.set_previous_date, self.previous_date, self.previous_date.hour).open()
+        except AttributeError:
+            fdate = self.predicter.result[0][0]
+            prevdate = datetime.date(fdate.year, fdate.month, fdate.day)
+            TimePicker(self.set_previous_date, prevdate).open()
 
     def on_predict(self):
         """
@@ -367,13 +376,6 @@ class MainScreen(Screen):
         in day report to match the data for that date
         and time
         """
-        #TODO: delete this line
-        #month = random.randint(1, 5)
-        #day = random.randint(1, 30)
-        #year = 2018
-        #hour = random.randint(0, 23)
-        # TODO: end delete
-
         entry = self.predicter.result[self.indices[(month, day, year, hour)]]
         self.update_date_time(month, day, year, hour, entry[0].minute)
         self.temp = entry[0].temperature
@@ -447,8 +449,6 @@ class HoverButton(Button, HoverBehavior):
 
     def on_leave(self, *args):
         pass
-
-
 
 class DaySelector(AnchorLayout):
     shown = BooleanProperty(False)
@@ -532,7 +532,7 @@ class DatePicker(FloatLayout, ModalView):
         
 
     def ok_click(self):
-        self.callback(date(self.sel_year, self.sel_month, self.sel_day))
+        self.callback(datetime.datetime(self.sel_year, self.sel_month, self.sel_day, 0, 0))
         self.dismiss()
 
     def fmt_lbl_date(self, year, month, day):
@@ -625,6 +625,64 @@ class DatePicker(FloatLayout, ModalView):
             y = sy
             m = sl
         self.update_cal_matrix(y, m)
+
+class TimeSelector(AnchorLayout):
+    shown = BooleanProperty(False)
+
+    def __init__(self, parent):
+        super(TimeSelector, self).__init__()
+        self.parent_class = parent
+        Window.bind(on_resize=self.move_resize)
+
+    def update(self):
+        parent = self.parent_class
+        if parent.sel_hour == parent.hour:
+            self.shown = True
+        else:
+            self.shown = False
+
+    def set_widget(self, widget):
+        self.selected_widget = widget
+        self.pos = widget.pos
+        self.move_resize(do_again=True)
+        self.update()
+
+    def move_resize(self, window=None, width=None, height=None, do_again=True):
+        self.pos = self.selected_widget.pos
+        if do_again:
+            Clock.schedule_once(lambda x: self.move_resize(do_again=False), 0.01)
+
+
+class TimePicker(FloatLayout, ModalView):
+    _sel_time_widget = ObjectProperty()
+    sel_hour = NumericProperty()
+    callback = ObjectProperty()
+    background_color = ListProperty([0, 0, 0, 0.7])
+
+    class SetTimeError(Exception):
+        pass
+
+    def __init__(self, callback, date,
+                 hour=0, **kwargs):
+        self.callback = callback
+        self.date = date
+        self.sel_hour = hour # hour on GUI
+        self.hour = self.sel_hour # hour once okay is hit
+        self.selector = TimeSelector(parent=self)
+        super(TimePicker, self).__init__(**kwargs)
+        self.selector.update()
+
+    def ok_click(self):
+        self.hour = self.sel_hour
+        self.callback(datetime.datetime(self.date.year, self.date.month, self.date.day, self.hour, 56))
+        self.dismiss()
+
+    def change_hour(self, operation):
+        op = 1 if operation is 'down' else -1
+        sh = self.sel_hour
+        sh = 23 if sh + op == -1 else 0 if sh + op == 24 else sh + op
+        self.sel_hour = sh
+        self.selector.update()
 
 class FirstKivy(App):
 
