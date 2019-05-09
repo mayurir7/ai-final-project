@@ -13,8 +13,6 @@ from kivy.uix.dropdown import DropDown
 from kivy.input.providers import mouse
 from kivy.properties import BoundedNumericProperty, NumericProperty, StringProperty, ReferenceListProperty, ListProperty,BooleanProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
-from kivymd.elevationbehavior import RectangularElevationBehavior
-from theming import ThemableBehavior, ThemeManager
 from kivy.metrics import dp
 from kivy.uix.widget import Widget
 from kivy.uix.filechooser import FileChooserListView
@@ -195,7 +193,7 @@ class MainScreen(Screen):
     c2 = StringProperty("#232323")
     c3 = StringProperty("#1a1a1a")
     c4 = StringProperty("#c0c0c0")
-    c5 = StringProperty("#00eda2")
+    c5 = StringProperty("#c01111")
     c6 = StringProperty("#30b023")
     c7 = StringProperty("#3e3e3e")
     wc = StringProperty("#ffffff")
