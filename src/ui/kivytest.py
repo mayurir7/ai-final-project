@@ -242,13 +242,20 @@ class MainScreen(Screen):
 
     def show_example_date_picker(self):
         pd = self.previous_date
+        # pass first and last date into date picker
+        fdate = self.predicter.result[0][0]
+        ldate = self.predicter.result[len(self.predicter.result) - 1][0]
+        mindate = datetime.date(fdate.year, fdate.month, fdate.day)
+        maxdate = datetime.date(ldate.year, ldate.month, ldate.day)
         try:
+            # make date picker that starts on currently selected date
             DatePicker(self.set_previous_date,
-                            pd.year, pd.month, pd.day).open()
+                            pd.year, pd.month, pd.day,
+                            maxdate, mindate).open()
         except AttributeError:
-            fdate = self.predicter.result[0][0]
+            # make date picker that starts on first date in data
             DatePicker(self.set_previous_date,
-                            fdate.year, fdate.month, fdate.day).open()
+                            fdate.year, fdate.month, fdate.day, maxdate, mindate).open()
 
     def on_predict(self):
         """
@@ -504,7 +511,7 @@ class DatePicker(FloatLayout, ModalView):
         pass
 
     def __init__(self, callback, year, month, day,
-                 firstweekday=0,
+                 maxdate, mindate, firstweekday=0,
                  **kwargs):
         self.callback = callback
         self.cal = calendar.Calendar(firstweekday)
@@ -514,12 +521,15 @@ class DatePicker(FloatLayout, ModalView):
         self.month = self.sel_month
         self.year = self.sel_year
         self.day = self.sel_day
+        self.maxdate = maxdate
+        self.mindate = mindate
         super(DatePicker, self).__init__(**kwargs)
         self.selector = DaySelector(parent=self)
         self.generate_cal_widgets()
         self.update_cal_matrix(self.sel_year, self.sel_month)
         self.set_month_day(self.sel_day)
         self.selector.update()
+        
 
     def ok_click(self):
         self.callback(date(self.sel_year, self.sel_month, self.sel_day))
@@ -611,6 +621,9 @@ class DatePicker(FloatLayout, ModalView):
         sl, sy = self.month, self.year
         m = 12 if sl + op == 0 else 1 if sl + op == 13 else sl + op
         y = sy - 1 if sl + op == 0 else sy + 1 if sl + op == 13 else sy
+        if datetime.date(y, m, 1) > self.maxdate or datetime.date(y, m, 28) < self.mindate:
+            y = sy
+            m = sl
         self.update_cal_matrix(y, m)
 
 class FirstKivy(App):
