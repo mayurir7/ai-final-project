@@ -17,6 +17,7 @@ class PredictSources():
         self.final_weights = self.getWeights()
         self.runner = Runner(0, 70000, 0, 0.1, 0.5, path_to_data, path_to_energy, debug=True)
         self.capacity = list(self.runner.features.capacity) #capacity
+        print self.capacity
         self.result = []
 
     def getWeights(self):
@@ -46,7 +47,7 @@ class PredictSources():
             self.result.append((self.runner.features.raw_data[index], energy_gained, action, energy_levels, energy_needed))
 
 if __name__ == '__main__':
-    test = PredictSources(path_to_data = "../data/1month.txt", path_to_energy="../data/2018load.csv")
+    test = PredictSources(path_to_data = "../data/5months.txt", path_to_energy="../data/2018load.csv")
     test.prediction()
     total_energy_levels = 0.0
     total_renewables_used = 0.0

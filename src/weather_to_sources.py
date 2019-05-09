@@ -20,13 +20,13 @@ class State():
         featureExtractor.initializeState(self, RandomReader(24 * 24))
 
     def getWind(self):
-        return self.energy_levels[EnergySource.WIND.value]
+        return self.energy_levels[EnergySource.WIND]
     
     def getSolar(self):
-        return self.energy_levels[EnergySource.SOLAR.value]
+        return self.energy_levels[EnergySource.SOLAR]
 
     def getHydro(self):
-        return self.energy_levels[EnergySource.HYDRO.value]
+        return self.energy_levels[EnergySource.HYDRO]
 
 
 class FeatureExtractor():
@@ -38,7 +38,7 @@ class FeatureExtractor():
         self.features = []  #holds (wind, solar, hydro) in MW per day
         self.energy_needed = [] #holds energy needed in MW per hour
         self.energy_gained = [] # holds energy gained per hour
-        self.capacity = [0.0,0.0,0.0]
+        self.capacity = [100000.0,100000.0,100000.0]
         self.readData(path_to_data, path_to_energy)
 
     def readData(self, path_to_data, path_to_energy):
@@ -144,13 +144,13 @@ class FeatureExtractor():
             solar_power = self.calculate_solar_power(raw_data[idx].sunlight)
             hydro_power = self.calculate_hydro_power()
             if idx == 0:
-                state.energy_levels[EnergySource.WIND.value] += wind_power
-                state.energy_levels[EnergySource.SOLAR.value] += solar_power
-                state.energy_levels[EnergySource.HYDRO.value] += hydro_power
+                state.energy_levels[EnergySource.WIND] += wind_power
+                state.energy_levels[EnergySource.SOLAR] += solar_power
+                state.energy_levels[EnergySource.HYDRO] += hydro_power
             
-            self.capacity[EnergySource.WIND.value] += wind_power
-            self.capacity[EnergySource.SOLAR.value] += solar_power
-            self.capacity[EnergySource.HYDRO.value] += hydro_power
+        #self.capacity[EnergySource.WIND] = state.energy_levels[EnergySource.WIND] * 20
+        #self.capacity[EnergySource.SOLAR] = state.energy_levels[EnergySource.SOLAR] * 20
+        #self.capacity[EnergySource.HYDRO] = state.energy_levels[EnergySource.HYDRO] * 20
 
 
     def getNumFeatures(self):
