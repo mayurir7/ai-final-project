@@ -249,9 +249,9 @@ class MainScreen(Screen):
             self.sum_total_energy_needed += tuple[4]
             self.sum_energy_saved += sum(tuple[2])
 
-        self.sum_total_energy_needed = round(self.sum_total_energy_needed / 1000, 3)
-        self.sum_energy_saved = round(self.sum_energy_saved, 3)
-        self.sum_energy_used = [round(i, 3) for i in self.sum_energy_used]
+        self.sum_total_energy_needed = round(self.sum_total_energy_needed / 100000, 3)
+        self.sum_energy_saved = round(self.sum_energy_saved / 1000, 3)
+        self.sum_energy_used = [round(i / 1000.0, 3) for i in self.sum_energy_used]
 
         # initialize dynamic hourly properties
         first = self.predicter.result[0][0] 
@@ -271,7 +271,8 @@ class MainScreen(Screen):
         formatter = DateFormatter('%m-%d-%y\n%H:%M')
         dates = []
         s = []
-        for date in self.predicter.result:
+        for idx in range(0, len(self.predicter.result), 24):
+            date = self.predicter.result[idx]
             dates.append(datetime.datetime(date[0].year, date[0].month, date[0].day, date[0].hour, date[0].minute))
             s.append(round(sum(date[2]) / date[4] * 100))
         fig, ax = plt.subplots()
