@@ -10,29 +10,59 @@ BoxLayout:
             name: 'main'
 
 <StartScreen>:
-    canvas:
-        Color: 
-            rgb: [.1, .1,.1]
-        Rectangle:
-            pos: self.pos
-            size: self.size
-    BoxLayout:
+    FloatLayout:
+        size: 800, 650
+        canvas:
+            Color: 
+                rgb: [.05, .05,.05]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+            Color: 
+                rgb: utils.get_color_from_hex("#1a1a1a")
+            Rectangle:
+                pos: 200, 200
+                size: 400, 250
         Label:
+            size_hint: None, None
+            halign: "center"
+            valign: "bottom"
             text: "intelligrid"
-            font_name: "Gotham"
-            font_size: 40
-            bold: True
-        Button:
+            text_size: self.size
+            font_name: "GothamB"
+            color: utils.get_color_from_hex("#c0c0c0")
+            font_size: 32
+            size: 400, 100
+            pos: 200, 320
+        HoverButton:
+            id: time_selector_ok
             text: "New Plan"
+            size_hint: (None, None)
             font_name: "Gotham"
-            font_size: 30
-            on_press: root.show_load(root.load_predicter)
-        Button:
+            font_size: 14
+            size: 100, 40
+            pos: 300, 270
+            background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+            background_down: 'images/LightGrey.jpg'
+            on_release: root.show_load(root.load_predicter)
+        HoverButton:
+            id: time_selector_ok
             text: "Open Plan"
+            size_hint: (None, None)
             font_name: "Gotham"
-            font_size: 30
-            on_press: root.show_load(root.load_predictions)
-        
+            font_size: 14
+            size: 100, 40
+            pos: 400, 270
+            background_normal: 'images/LightGrey.jpg' if self.hovered else 'images/DefaultGrey.jpg'
+            background_down: 'images/LightGrey.jpg'
+            on_release: root.show_load(root.load_predictions)
+        FloatLayout:
+            canvas:
+                Color: 
+                    rgb: utils.get_color_from_hex("#c0c0c0")
+                Rectangle:
+                    pos: 400, 275
+                    size: 1, 30
 <LoadDialog>:
     BoxLayout:
         size: root.size
@@ -536,27 +566,17 @@ BoxLayout:
                             pos: self.pos
                             size: self.size
                 Label:
+                    id: energy_saved
                     size_hint: None, None
-                    halign: "right"
+                    halign: "center"
                     valign: "bottom"
-                    text: str(root.sum_energy_saved)
+                    text: str(root.sum_energy_saved) + " Gwh"
                     text_size: self.size
                     font_name: "SegoeL"
                     font_size: 36
                     height: 75
-                    width: 150
+                    width: 240
                     pos: 0, 40
-                Label:
-                    size_hint: None, None
-                    halign: "left"
-                    valign: "bottom"
-                    text: "Gwh"
-                    text_size: self.size
-                    font_name: "SegoeL"
-                    font_size: 20
-                    height: 75
-                    width: 80
-                    pos: 151, 45
                 Label:
                     size_hint: None, None
                     halign: "center"

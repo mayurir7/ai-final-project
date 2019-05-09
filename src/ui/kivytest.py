@@ -195,7 +195,7 @@ class MainScreen(Screen):
     c2 = StringProperty("#232323")
     c3 = StringProperty("#1a1a1a")
     c4 = StringProperty("#c0c0c0")
-    c5 = StringProperty("#c00000")
+    c5 = StringProperty("#00eda2")
     c6 = StringProperty("#30b023")
     c7 = StringProperty("#3e3e3e")
     wc = StringProperty("#ffffff")
