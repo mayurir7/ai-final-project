@@ -172,11 +172,13 @@ class LoadSave(FloatLayout):
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
+    path = os.getcwd()
 
 class SaveDialog(FloatLayout):
     save = ObjectProperty(None)
     text_input = ObjectProperty(None)
     cancel = ObjectProperty(None)
+    path = os.getcwd()
 
 class MainScreen(Screen):
     c1 = StringProperty("#2a2a2a")
